@@ -1,0 +1,418 @@
+ELIMINAZIONE ATTRIBUTI MULTIVALORE
+
+-Attributo "lingua audio" "lingua sottotitoli" in film,                                   DONE
+	-si elimina l'attributo
+	-si crea l'entità lingua
+	-si creano due relazioni, una per l'audio, una per i sottotitoli
+
+-Attributo IPrange di paese								  DONE
+	-si elimina l'attributo
+	-si crea l'entità IPrange
+	-si crea la relazione Localizzazione
+
+
+
+
+ELIMINAZIONE GENERALIZZAZIONI
+
+
+soluzioni previste da tonellotto nelle slide:
+	1. Accorpamento delle figlie della generalizzazione nel 
+	genitore
+	2. Accorpamento del genitore della generalizzazione 
+	nelle figlie
+	3. Sostituzione della generalizzazione con relationship
+	• la prima conviene se gli accessi al padre e alle figlie sono 
+	contestuali;
+	• la seconda conviene se gli accessi alle figlie sono distinti;
+	• la terza conviene se gli accessi alle entità figlie sono 
+	separati dagli accessi al padre;
+
+
+
+
+
+-Eliminazione generalizzazione "Persona"
+	-si lasciano le entità figlie separate (perchè accessi alle figlie distinti)   DONE
+
+
+
+
+
+-Eliminazione generalizzazione "Recensione"
+POSSIBILITà 1:
+	-Si crea Entità recensione, con attributo tipo. 
+		Qui l'entità recensione o si lega a critico e a cliente 
+		(inevitabili valori null), oppure si lega a un'entità Autore (crea anomalie)
+POSSIBILITà 2:                                                                                             DONE
+	-Si decompone nelle figlie, che diventano delle associazioni indipendenti tra di loro
+		Qui il problema è che la stessa persona non può lasciare due recensioni allo stesso, accettabile
+
+
+
+
+
+-Come trattare la gestione dei formati
+POSSIBILITà 1:
+	-Come consiglia lui, "codifica" intesa
+	 semplicemente come relazione tra Film e Formato
+		Qui il problema è che Visualizzazione, Presenza devono
+		essere connessi sia a Film che a Formato, e poi un vincolo
+		deve verificare la coerenza (Ogni coppia film formato 
+		deve essere effettivamente codificata)
+POSSIBILITà 2:	
+	-Creare entità File 
+		A livello di consegna non parla di file
+
+	meglio vedere se conviene quando vengono fatte le operazioni, o forse meglio ancora chiedere a un ricevimento
+
+	-se si dovesse passare dell'attuale schema senza "file" a uno schema che ha file, si dovrebbe:
+		-reificare "Codifica" in "File", creando una relazione tra Formato e File, e una tra File e Film
+		-modificare le relazioni Visualizzazione e Presenza, che diventerebbero binarie
+		-a questo punto si potrebbe anche separare formato audio da formato video, entrambi legati a File, ed entrambi legati a Paese
+		da "Non supportato"
+
+
+
+
+PARTIZIONAMENTI, ACCORPAMENTI:
+-quello per le recensioni
+-accorpamento di server e aree geografiche
+--------------------------------------------------------------------------------------------------
+
+BUSINESS RULE:
+-L'anno del premio assegnato a un film non può essere precedente all'uscita di un film
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+POSSIBILI RIDONDANZE SENSATE
+-numero di visualizzazioni
+-carico di un server
+-utente coinvolto nella fattura 
+-grande mv in cui salviamo per ogni coppia Film Utente il rating personalizzato
+-grande mv in cui salviamo per ogni coppia di persone la similitudine
+
+
+---------------------------------------------------------------------------------
+
+8 POSSIBILI OPERAZIONI
+non sono necessariamente operazioni da realizzare attraverso procedure o function, 
+sono le operazioni attraverso le quali valutiamo l'opportunità di mettere una ridondanza o no
+
+
+
+-Inserimenti
+	-Film
+	-Utente
+	-Connessione           
+	-Visualizzazione       
+	-Recensione
+	-Pagamento (fattura)
+
+
+	
+-Controllo pagamenti
+-ritornare visualizzazioni film
+-Carico di un server
+-spostamento di un file da un server ad un altro
+
+(Complicate)
+-Rating personalizzato (funzione che dati Utente e Film, fa il rating)
+-Similitudine tra due utenti (utile per la precedente)
+-Caching (procedure, forse event, che quando chiamata fa tutti gli spostamenti 
+utili tra i vari server)
+
+
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Scelta di identificatori:
+	
+	al momento Connessione ha un ID
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Ridondanze convenienti:
+	1-incasso totale di ogni mese
+	2-se un utente ha pagamenti in arretrato, (in questo caso non può accedere alla piattaforma)
+	3-mettere nella fattura l'utente che paga
+	4-numero visualizzazioni di un film
+	5-carico di un server
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+POSSIBILE TRADUZIONE NEL MODELLO LOGICO:
+-senza decomposizioni (andrebbe fatta la decomposizione di file)
+-senza introduzione di ridondanze
+-chiaramente nella documentazione la verifica bcnf va fatta dopo l'introduzione delle ridondanze
+
+AREA CONTENUTI
+	Film(*Id, titolo, descrizione, genere, durata, annoProduzione, PaeseProduzione, Regista)
+	Attore(*Id, Nome, Cognome)
+	Regista(*Id, Nome, Cognome)
+	Premio(*Nome, *Categoria, *Anno, Film)
+	Paese(*Cod, Nome, AreaGeografica, Lat, Lng)
+	IPrange(*Start, End, Paese)						non so se va in questa area
+	Critico(*Id, Nome, Cognome)
+	Lingua(*Nome)
+	Parte(*Film, *Id)
+	Recensione(*Film, *Cliente, Votazione, data)
+	Critica(*Film, *Critico, Votazione, data)
+	LinguaAudio(*Lingua, *Film)
+	LinguaSottotitoli(*Lingua, *Film)
+
+AREA FORMATI
+	File(*Id, nomeFormato, Risoluzione, Bitrate, qAudio, qVideo, Rapporto, DataInserimento, dimensione, durata, film, server, inizio)
+	NonSupportato(*File, *Paese)
+
+AREA CLIENTI
+	Cliente(*Codice, Nome, Cognome, Email, Password)
+	CartaDiCredito(*Numero, DataScadenza, Circuito, Proprietario)
+	PianoTariffario(*Nome, tariffaMensile, ContenutiDisponibili, Pubblicità, QualitàMassima)
+	Sottoscrizione(*CartadiCredito, *PianoTariffario, *Data)
+
+AREA CDN
+	Server(*Id, AreaGeografica, banda, capacità, lat, long)
+	Connessione(*Id, IP, Dispositivo, Cliente, Inizio, Server, InizioServer)
+	Dispositivo(*ID, azienda Produttrice, modello, anno Uscita, RAM, nCore, fProcessore, risoluzione)
+	Visualizzazione(*Connessione, *File, *Inizio, Fine)
+
+
+
+TUTTE IN BCNF, tranne File
+per fare la decomposizione bisogna separare il file dalle specifiche del formato
+
+
+POSSIBILE TRADUZIONE NEL MODELLO LOGICO
+-con introduzione delle ridondanze
+-senza verifica bcnf
+
+AREA CONTENUTI
+	Film(*Id, titolo, descrizione, genere, durata, annoProduzione, PaeseProduzione, Regista)
+	Attore(*Id, Nome, Cognome)
+	Regista(*Id, Nome, Cognome)
+	Premio(*Nome, *Categoria, *Anno, Film)
+	Paese(*Cod, Nome, AreaGeografica, Lat, Lng)
+	IPrange(*Start, End, Paese)
+	Critico(*Id, Nome, Cognome)
+	Lingua(*Nome)
+	Parte(*Film, *Id)
+	Recensione(*Film, *Cliente, Votazione, data)
+	Critica(*Film, *Critico, Votazione, data)
+	LinguaAudio(*Lingua, *Film)
+	LinguaSottotitoli(*Lingua, *Film)
+
+AREA FORMATI
+	File(*Id, nomeFormato, Risoluzione, Bitrate, qAudio, qVideo, Rapporto, DataInserimento, dimensione, durata, film,  server, inizio)
+	NonSupportato(*File, *Paese)
+
+AREA CLIENTI
+	Cliente(*Codice, Nome, Cognome, Email, Password, PagamentiArretrati)
+	CartaDiCredito(*Numero, DataScadenza, Circuito, Proprietario)
+	PianoTariffario(*Nome, tariffaMensile, ContenutiDisponibili, Pubblicità, QualitàMassima)
+	Sottoscrizione(*CartadiCredito, *PianoTariffario, *Data)
+
+AREA CDN
+	Server(*Id, AreaGeografica, banda, capacità, lat, long, Carico)
+	Connessione(*Id, IP, Dispositivo, Cliente, Inizio, Fine)
+	ConnessioneCDN(*Server, *Connessione, *Inizio, Fine)
+	Dispositivo(*ID, azienda Produttrice, modello, anno Uscita, RAM, nCore, fProcessore, risoluzione)
+	Presenza(*File, *Server, *Inizio, Fine)
+	Visualizzazione(*Connessione, *File, *Inizio, Fine)
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Verifica bcnf:
+Film:
+	{id -> tutte le altre}
+	BCNF
+Attore:
+	{id -> tutte le altre}
+	BCNF
+Regista:
+	{id -> tutte le altre}
+	BCNF
+Premio:
+	{Nome, Categoria, Anno -> tutte le altre}
+	BCNF
+Critico:
+	{id -> tutte le altre}
+	BCNF
+Lingua:
+	{}
+	BCNF
+Parte:
+	{}
+	BCNF
+Recensione:
+	{Film, Cliente -> tutte le altre}
+	BCNF
+Critica:
+	{Film, Critico -> tutte le altre}
+	BCNF
+LinguaAudio:
+	{}
+	BCNF
+LinguaSottotitoli:
+	{}
+	BCNF
+File:
+	{id -> tutte le altre, 
+	nomeFormato -> Risoluzione, Bitrate, qAudio, qVideo, Rapporto}                                !!!!!!!
+	NON BCNF
+Cliente:
+	{Codice -> tutte le altre}
+	BCNF
+CartaDiCredito:
+	{numero -> tutte le altre}
+	BCNF
+Fattura:
+	{id -> tutte le altre                             
+	cartadiCredito -> Cliente}                                                                     !!!!!!
+	NON BCNF
+PianoTariffario:
+	{nome -> tutte le altre}
+	BCNF
+Server:
+	{Id -> tutte le altre, 
+	AreaGeografica -> tuttelealtre}
+	BCNF
+Connessione:
+	{id -> tutte le altre}
+	BCNF
+ConnessioneCDN:
+	{Server, Connessione, Inizio -> tutte le altre}
+	BCNF
+Dispositivo:
+	{id -> tutte le altre
+	Azienda, Dispositivo -> tutte le altre}
+	BCNF
+Presenza:
+	{File, Server, Inizio -> tutte le altre}
+	BCNF
+Visualizzazione:
+	{File, Connessione, Inizio-> tutte le altre}
+	BCNF
+IP-range:
+	{Start -> tutte le altre}
+	BCNF
+
+
+
+fattura si può lasciare non in bcnf, File si decompone in 
+
+File(*Id, nomeFormato, DataInserimento, dimensione, durata, film)
+Formato(nomeFormato*, Risoluzione, Bitrate, qAudio, qVideo, Rapporto)
+
+
+
+POSSIBILE TRADUZIONE NEL MODELLO LOGICO
+-con introduzione delle ridondanze
+-con verifica bcnf
+
+
+
+tabelle 
+AREA CONTENUTI
+	Film(*Id, titolo, descrizione, genere, durata, annoProduzione, PaeseProduzione, Regista)	
+	Attore(*Id, Nome, Cognome)
+	Regista(*Id, Nome, Cognome)
+	Premio(*Nome, *Categoria, *Anno, Film)
+	Paese(*Cod, Nome, AreaGeografica, Lat, Lng)
+	IPrange(*Start, End, Paese)
+	Critico(*Id, Nome, Cognome)
+	Lingua(*Nome)
+	Parte(*Film, *Attore)
+	Recensione(*Film, *Cliente, Votazione, data)
+	Critica(*Film, *Critico, Votazione, data)
+	LinguaAudio(*Lingua, *Film)
+	LinguaSottotitoli(*Lingua, *Film)
+
+AREA FORMATI
+	File(*Id, formato, DataInserimento, dimensione, durata, film, server, inizio)
+	Formato(Id, nomeFormato, Risoluzione, Bitrate, qAudio, qVideo, Rapporto)
+	NonSupportato(*File, *Paese)
+
+AREA CLIENTI
+	Cliente(*Codice, Nome, Cognome, Email, Password, PagamentiArretrati)
+	CartaDiCredito(*Numero, DataScadenza, Circuito, Proprietario)
+	PianoTariffario(*Nome, tariffaMensile, ContenutiDisponibili, Pubblicità, QualitàMassima)
+	Sottoscrizione(*CartadiCredito, *PianoTariffario, *Data)
+
+AREA CDN
+	Server(*Id, AreaGeografica, banda, capacità, lat, long, Carico)
+	Connessione(*Id, IP, Dispositivo, Cliente, Inizio, Fine)
+	ConnessioneCDN(*Server, *Connessione, *Inizio, Fine)
+	Dispositivo(*ID, azienda Produttrice, modello, anno Uscita, RAM, nCore, fProcessore, risoluzione)
+	Presenza(*File, *Server, *Inizio, Fine)
+	Visualizzazione(*Connessione, *File, *Inizio, Fine)
+------
+
+vincoli di integrità relazionali
+
+Film(PaeseProduzione) -> Paese
+Film(Regista) -> Regista
+Premio(Film) -> Film
+Paese(AreaGeografica) -> Server(AreaGeografica)
+IPrange(Paese) -> Paese(Cod)
+Parte(Film) -> Film
+Parte(Attore) -> Attore
+Recensione(Film) -> Film
+Recensione(Cliente) -> Cliente
+Critica(Film) -> Film
+Critica(Critico) -> Critico
+LinguaAudio(Lingua) -> Lingua
+LinguaAudio(Film) -> Film
+LinguaSottotitoli(Lingua) -> Lingua
+LinguaSottotitoli(Film) -> Film
+
+File(formato)-> Formato
+NonSupportato(File) -> File
+NonSupportato(Paese) -> Paese
+
+Cliente(Abbonamento) -> PianoTariffario
+CartadiCredito(Proprietario) -> Cliente
+Sottoscrizione(Cartadicredito) -> Cartadicredito(Numero)
+Sottoscrizione(PianoTariffario) -> PianoTariffario(Nome)
+
+Connessione(Dispositivo) -> Dispositivo
+Connessione(Cliente) -> Cliente
+ConnessioneCDN(Server) -> Server
+ConnessioneCDN(Connessione) -> Connessione
+Presenza(File) -> File
+Presenza(Server) -> Server
+Visualizzazione(Connessione) -> Connessione
+Visualizzazione(File) -> File
+
+-----
+
+vincoli generici
+- L'anno di un premio non può essere precedente all'uscita del film
+- Un cliente può mettere una recensione a un film solo dopo averlo visto
+- Inizio e fine di una connessioneCDN devono essere compresi tra inizio e fine della Connessione (alla piattaforma) associata
+- Inizio e fine di una visualizzazione devono essere compresi tra inizio e fine della Connessione associata
+- La visualizzazione di un file su un server è possibile solo se sul server è disponibile il film
+- Inizio di presenza di un file deve essere successiva alla data di inserimento del file
+- Se durante una connessione si vuole guardare un file, e la coppia (formato del file, paese) si trova in NonSupportato, non si deve permettere la visualizzazione
+
+(riguardanti la compatibilità formato-dispositivo)
+...
+(riguardanti abbonamento)
+
+
+
+	
