@@ -255,13 +255,14 @@ def genera_film():
     lista_codici += ['DE' for _ in range(5)]
     lista_codici += ['IN' for _ in range(5)]
     df['Regista'] = [random.randint(0, 199) for _ in range(len(df))]
+    df['Regista'] = 3 * df['Regista'] + 1
     df['Genere'] = [random.choice(["Action", "Animation", "Children", "Comedy",
                                    "Documentary", "Drama", "Horror", "Music", "Sci-Fi"]) for _ in range(len(df))]
     df['PaeseProduzione'] = [random.choice(lista_codici) for _ in range(len(df))]
     df.rename(columns={'film_id': 'Id', 'title': 'Titolo', 'description': 'Descrizione',
                        'length': 'Durata', 'release_year': 'AnnoProduzione', 
                        'PaeseProduzione':'PaeseProduzione'}, inplace=True)
-    df['AnnoProduzione'] = [random.randint(1980, 2021) for _ in range(len(df))]
+    df['AnnoProduzione'] = [random.randint(2013, 2022) for _ in range(len(df))]
     df = df[['Id', 'Titolo', 'Descrizione', 'Genere', 'Durata',
              'AnnoProduzione', 'PaeseProduzione', 'Regista']]
     df['Id'] = df['Id'] - 1
@@ -286,6 +287,7 @@ def genera_parte():
     df = df[['actor_id', 'film_id']]
     df.rename(columns={'actor_id': 'Attore', 'film_id': 'Film'}, inplace=True)
     df['Film'] = df['Film'] - 1
+    df['Attore'] = 3 * df['Attore'] 
     return Tabella("parte", df)
 
 
@@ -361,7 +363,8 @@ def genera_lingua():
     return Tabella("lingua", df)
 
 
-def genera_premio():
+def genera_premio(film):
+    # prende in input il dataframe dei film
     categorie_oscar = [
         'Miglior Film',
         'Miglior Regista',
@@ -477,24 +480,36 @@ def genera_premio():
     # Dizionario risultante
     result_dict = {}
 
-    # Unione delle liste con le stesse chiavi
+    # Unione dei diz con le stesse chiavi
     for d in [data_venice, data_berlin, data_cannes, data_bafta, data_oscar]:
         for key, value in d.items():
             result_dict.setdefault(key, []).extend(value)
 
     df = pd.DataFrame(result_dict)
-    L = list(range(2015, 2023))
+    L = list(range(2015, 2023)) # intervallo dei premi
 
     # Prodotti cartesiani tra righe di df ed elementi di L
     cartesian_product = list(itertools.product(df.iterrows(), L))
 
     # Creazione del DataFrame df_1
-    df = pd.DataFrame(
-        {'Premio': [row[1]['Premio'] for row, val in cartesian_product],
-         'Categoria': [row[1]['Categoria'] for row, val in cartesian_product],
-         'Anno': [val for row, val in cartesian_product]}
-    )
-    df['Vincitore'] = [random.randint(0, 999) for _ in range(len(df))]
+    df = pd.DataFrame({
+        'Premio': [row[1]['Premio'] for row, val in cartesian_product],
+        'Categoria': [row[1]['Categoria'] for row, val in cartesian_product],
+        'Anno': [val for row, val in cartesian_product],
+        'Vincitore': None
+        })
+    lista_vincitori = []
+    for index, rowP in df.iterrows():
+        lista_film_adatti = []
+        for index, rowF in film.iterrows():
+            if rowF['AnnoProduzione'] <= rowP['Anno'] and rowF['AnnoProduzione'] >= rowP['Anno'] - 1:
+                lista_film_adatti.append(rowF['Id'])
+        lista_vincitori.append(random.choice(lista_film_adatti))
+    #df['Vincitore'] = [random.randint(0, 999) for _ in range(len(df))]
+    #lista_anni = [film[film['Id'] == val]['AnnoProduzione'] for val in df['Vincitore']]
+    #lista_anni = [lista_anni[i] + random.choices([0, 1], weights=[0.8, 0.2]) for i in range(len(lista_anni))]
+    #df['Anno'] = lista_anni
+    df['Vincitore'] = lista_vincitori
     return Tabella("premio", df)
 
 
@@ -588,7 +603,7 @@ def genera_critica():
             data.append((film, critic, voto, random_date))
     df = pd.DataFrame(data, columns=["Film", "Critico", "Voto", "Data"])
     df['Data'] = df['Data'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
-
+    df['Critico'] = 3 * df['Critico'] + 2
     return Tabella("critica", df)
 
 
@@ -749,7 +764,7 @@ def genera_connessione():
         quanti_ip, quanti_disp = random.choices([1, 2], weights=[0.9, 0.1])[0], random.choice([1, 2])
         # liste di ip e disp "preferiti" del cliente
         ip_scelti = [g_random_ip() for _ in range(quanti_ip)]
-        disp_scelti = [random.randint(0, tavola_volumi.n_Dispositivo) for _ in range(quanti_disp)]
+        disp_scelti = [random.randint(0, tavola_volumi.n_Dispositivo - 1) for _ in range(quanti_disp)]
 
         # scegli len_l1, len_l2 tali che 2*len_l2 + len_l1 = num_conn_per_cliente * num_mesi
         len_l2 = random.randint(int(0.10 * tavola_volumi.num_conn_per_cliente * tavola_volumi.num_mesi),
@@ -835,15 +850,15 @@ def genera_formato():
         'qAudio': [0.85, 0.75, 0.95, 0.80, 0.90, 0.70, 0.92, 0.82, 0.88, 0.65],
         'qVideo': [0.90, 0.85, 0.98, 0.88, 0.92, 0.80, 0.95, 0.87, 0.90, 0.75]
     }
-    df = pd.Dataframe(data)
+    df = pd.DataFrame(data)
     df['Id'] = df.reset_index().index
     df = df[['Id', 'nomeFormato', 'Risoluzione', 'Bitrate', 'qAudio', 'qVideo']]
-    return Tabella('formato', pd.DataFrame(data))
+    return Tabella('formato', df)
 
 
 def genera_file(tabella_formati, tabella_film):
     # richiede in input la tabella film, e quella formati
-    # File(*Id, nomeFormato, DataInserimento, dimensione, durata, film)
+    # File(*Id, nomeFormato, DataInserimento, dimensione, durata, film, server)
     list_formati = []
     list_film = []
     list_date = []
@@ -855,10 +870,10 @@ def genera_file(tabella_formati, tabella_film):
         quanti_file = np.random.poisson(tavola_volumi.num_file_per_film)
         if quanti_file > 9:
             quanti_file = tavola_volumi.num_file_per_film
-        # crea lista con righe formato
+        # crea dataframe con righe formato
         formati_list = tabella_formati.sample(quanti_file)
-        # scegli lista nomi formati
-        format_parz = formati_list['nomeFormato'].tolist()
+        # scegli lista id formati
+        format_parz = formati_list['Id'].tolist()
         # scegli lista dateinserimento
         dateins_parz = [random_date_between(datetime.now() - timedelta(days=tavola_volumi.num_mesi * 30), 
                                             datetime.now() - timedelta(days=tavola_volumi.num_mesi * 15)) 
@@ -876,14 +891,16 @@ def genera_file(tabella_formati, tabella_film):
         list_film += [i for _ in range(quanti_file)]
 
     df = pd.DataFrame({
-        'NomeFormato': list_formati,
+        'Formato': list_formati,
         'DataInserimento': list_date,
         'Dimensione': list_dim,
         'Durata': list_dur,
         'Film': list_film
     })
     df['Id'] = df.reset_index().index
+    df['Server'] = None
     df['DataInserimento'] = df['DataInserimento'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
+    df = df[['Id', 'Film', 'Formato', 'DataInserimento', 'Dimensione', 'Durata', 'Server']]
     return Tabella('file', df)
 
 
@@ -1078,48 +1095,87 @@ def genera_NonSupportato():
     return Tabella('nonSupportato', df)
 
 
-cl = genera_clienti()
-cl.genera_file_sql('popolamento_cliente.sql')
-cart = genera_carteDiCredito()
-cart.genera_file_sql('popolamento_cartaDiCredito.sql')
-pia = genera_pianoTariffario()
-pia.genera_file_sql('popolamento_pianotariffario')
-sot = genera_sottoscrizione(cart.df)
-sot.genera_file_sql('popolamento_sottoscrizione.sql')
+
+
 
 
 """
+
 att = genera_attore()
-att.dataframe_to_mysql_ddl()
+# att.dataframe_to_mysql_ddl()
 att.genera_file_sql('popolamento_attore.sql')
 
 reg = genera_regista()
-reg.dataframe_to_mysql_ddl()
+# reg.dataframe_to_mysql_ddl()
 reg.genera_file_sql('popolamento_regista.sql')
+"""
 
 form = genera_formato()
-form.dataframe_to_mysql_ddl()
+# form.dataframe_to_mysql_ddl()
 form.genera_file_sql('popolamento_formato.sql')
 
+"""
 cli = genera_clienti()
-cli.dataframe_to_mysql_ddl()
+# cli.dataframe_to_mysql_ddl()
 cli.genera_file_sql('popolamento_cliente.sql')
 
 disp = genera_dispositivo()
-disp.dataframe_to_mysql_ddl()
+# disp.dataframe_to_mysql_ddl()
 disp.genera_file_sql('popolamento_dispositivo.sql')
 
 pia = genera_pianoTariffario()
-pia.dataframe_to_mysql_ddl()
+# pia.dataframe_to_mysql_ddl()
 pia.genera_file_sql('popolamento_pianotariffario.sql')
 
 cr = genera_critico()
-cr.dataframe_to_mysql_ddl()
+# cr.dataframe_to_mysql_ddl()
 cr.genera_file_sql('popolamento_critico.sql')
 
 li = genera_lingua()
-li.dataframe_to_mysql_ddl()
-li.genera_file_sql('popolamento_lingua.sql')
+# li.dataframe_to_mysql_ddl()
+li.genera_file_sql('popolamento_lingua.sql')"""
 
+conn = genera_connessione()
+# conn.dataframe_to_mysql_ddl()
+conn.genera_file_sql('popolamento_connessione.sql')
 
-"""
+cart = genera_carteDiCredito()
+# cart.dataframe_to_mysql_ddl()
+cart.genera_file_sql('popolamento_cartadicredito.sql')
+
+nons = genera_NonSupportato()
+# nons.dataframe_to_mysql_ddl()
+nons.genera_file_sql('popolamento_nonsupportato.sql')
+
+film = genera_film()
+# film.dataframe_to_mysql_ddl()
+film.genera_file_sql('popolamento_film.sql')
+
+sott = genera_sottoscrizione(cart.df)
+# sott.dataframe_to_mysql_ddl()
+sott.genera_file_sql('popolamento_sottoscrizione.sql')
+
+part = genera_parte()
+# part.dataframe_to_mysql_ddl()
+part.genera_file_sql('popolamento_parte.sql')
+
+premio = genera_premio(film.df)
+# premio.dataframe_to_mysql_ddl()
+premio.genera_file_sql('popolamento_premio.sql')
+
+linguaa = genera_lingueAudio()
+# linguaa.dataframe_to_mysql_ddl()
+linguaa.genera_file_sql('popolamento_linguaaudio.sql')
+
+linguas = genera_linguaSottotitoli()
+# linguas.dataframe_to_mysql_ddl()
+linguas.genera_file_sql('popolamento_linguasottotitoli.sql')
+
+cra = genera_critica()
+# cra.dataframe_to_mysql_ddl()
+cra.genera_file_sql('popolamento_critica.sql')
+
+files = genera_file(form.df, film.df)
+# files.dataframe_to_mysql_ddl()
+files.genera_file_sql('popolamento_file.sql')
+
