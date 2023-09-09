@@ -22,8 +22,8 @@ class Elem:
 
 lista_elem = []
 # quelle decise a prescindere da sakila
-n_PianoTariffario = 5
-n_Server = 10
+n_PianoTariffario = 5 
+n_Server = 17
 
 
 
@@ -31,11 +31,13 @@ lista_elem.append(Elem("Server", "E", n_Server))
 lista_elem.append(Elem("PianoTariffario", "E", n_PianoTariffario))
 # quelle in sakila
 n_Film = 1000
-n_Attore = 201
-n_Parte = 2000
+n_Attore = 200
+
+num_att_per_film = 5
+n_Parte = n_Film * num_att_per_film
 n_Cliente = 599
-n_Paese = 200
-n_IPrange = 250000
+n_Paese = 249 # codici iso
+n_IPrange = 250000  
 n_Localizzazione = n_IPrange
 
 n_Produzione = n_Paese
@@ -68,9 +70,9 @@ che indica il numero di mesi atteso a partire da quando viene popolato
 num_mesi = 3
 num_mesi_exp = 2
 # di quanti anni dovranno essere inseriti i premi
-num_anni_premio = 10
+num_anni_premio = 7
 # quanti tipi di premio esistono
-num_premi = 10
+num_premi = 32
 n_Premio = num_anni_premio * num_premi
 n_Assegnazione = n_Premio
 
@@ -97,13 +99,14 @@ lista_elem.append(Elem("Pagamento", "R", n_Pagamento))
 num_conn_per_cliente = 10  # al mese
 n_Connessione = num_conn_per_cliente * (num_mesi + num_mesi_exp) * n_Cliente
 
-num_vis_per_conn = 1.3
+num_vis_per_conn = 1.3 
 n_Visualizzazione = n_Connessione * num_vis_per_conn
 n_ConnessioneCliente = n_Connessione
 n_Mezzo = n_Connessione
 n_FV = n_Visualizzazione
 n_VC = n_Visualizzazione
-n_Recensione = n_Visualizzazione
+num_rec_per_vis = 0.7 ### 0.7
+n_Recensione = n_Visualizzazione * num_rec_per_vis 
 n_Dispositivo = 10
 
 lista_elem.append(Elem("Connessione", "E", n_Connessione))
@@ -122,13 +125,17 @@ n_Codifica = n_File
 n_NonSupportato = 15
 num_Formato = 10
 
-num_spost_file = 100  # al mese
 
-n_Presenza = n_File + num_spost_file * (num_mesi + num_mesi_exp)
 
-num_connCDN_per_conn = 1.2
 
-n_ConnessioneServer = n_Connessione * num_connCDN_per_conn
+
+n_Presenza = n_File
+
+
+perc_conn_att = 0.25 # in un giorno in cui un utente si connette, per quanto tempo lo fa in perc?
+num_conn_attive = int(n_Cliente * (num_conn_per_cliente  /  30) * perc_conn_att)
+
+n_ConnessioneServer = num_conn_attive
 
 
 lista_elem.append(Elem("File", "E", n_File))
@@ -139,7 +146,7 @@ lista_elem.append(Elem("NonSupportato", "R", n_NonSupportato))
 
 # critica, lingua
 n_Critico = 5
-num_critiche_per_critico = 5
+num_critiche_per_critico = 20
 n_Critica = n_Critico * num_critiche_per_critico
 
 n_Lingua = 10
@@ -165,3 +172,4 @@ def stampa_latex():
         str_cod += "\n \hline \n"
 
     print(str_cod)
+

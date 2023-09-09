@@ -80,54 +80,60 @@ PARTIZIONAMENTI, ACCORPAMENTI:
 -accorpamento di server e aree geografiche
 --------------------------------------------------------------------------------------------------
 
-BUSINESS RULE:
--L'anno del premio assegnato a un film non può essere precedente all'uscita di un film
+
+OPERAZIONI SUI DATI
+
+1) Inserimento Connessione
+INPUT: Email, Password, IP
+OUTPUT: Record nella tabella Connessione
+
+2) Calcolo distanza
+INPUT: Connessione, Server
+OUTPUT: distanza tra il paese associato alla connessione e il server
+
+3) Ricerca del server migliore
+INPUT: Visualizzazione
+OUTPUT: Server migliore
+
+4) Richiesta visualizzazione
+INPUT: Connessione, Film
+OUTPUT: Record nella tabella Visualizzazione
+
+5) Raccomandazione contenuti
+INPUT: Persona, Film
+OUTPUT: Punteggio
+
+6) Sposta File per evitare sovraccarico
+INPUT: Cambio Connessione
+OUTPUT: Spostamento del file
+
+7) Inserimento sottoscrizione
+INPUT: CartadiCredito, PianoTariffario
+OUTPUT: Record nella tabella sottoscrizione
+
+8) Inserimento recensione
+INPUT: Persona, Film
+OUTPUT: Record nella tabella recensione
+
+9) Caching 
+INPUT: -
+OUTPUT: Spostamento dei file
 
 
 
+RIDONDANZE DA VALUTARE
+
+1) Abbonamento di ogni utente
+2) Scadenza abbonamento di ogni utente
+3) Distanze Paese-Server
+4) Paese in Connessione
+5) Numero visualizzazioni
+6) Rating medio
+7) Carico server
+8) Rating per ogni coppia persona-film
 
 
-
-
-
-
---------------------------------------------------------------------------------
-
-POSSIBILI RIDONDANZE SENSATE
--numero di visualizzazioni
--carico di un server
--grande mv in cui salviamo per ogni coppia Film Utente il rating personalizzato
--paese di una connessione
-
-
----------------------------------------------------------------------------------
-
-8 POSSIBILI OPERAZIONI
-non sono necessariamente operazioni da realizzare attraverso procedure o function, 
-sono le operazioni attraverso le quali valutiamo l'opportunità di mettere una ridondanza o no
-
-
-
--Inserimenti
-	-Film
-	-Utente
-	-Connessione           
-	-Visualizzazione       
-	-Recensione
-	-Sottoscrizione
-
-
-	
--Controllo pagamenti
--Carico di un server
--Trova file e server migliore quando richiesta una visualizzazione
-
-(Complicate)
--Rating personalizzato (funzione che dati Utente e Film, fa il rating)
--Similitudine tra due utenti (utile per la precedente)
--Caching 
-
-
+Le tabelle degli accessi sono su analisi_prestazioni.py
 
 
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||

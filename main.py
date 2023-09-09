@@ -263,8 +263,9 @@ def genera_film():
                        'length': 'Durata', 'release_year': 'AnnoProduzione', 
                        'PaeseProduzione':'PaeseProduzione'}, inplace=True)
     df['AnnoProduzione'] = [random.randint(2013, 2022) for _ in range(len(df))]
+    df['LivelloContenuto'] = [random.choices([0, 1, 2], weights=[0.6, 0.3, 0.1])[0] for _ in range(len(df))]
     df = df[['Id', 'Titolo', 'Descrizione', 'Genere', 'Durata',
-             'AnnoProduzione', 'PaeseProduzione', 'Regista']]
+             'AnnoProduzione', 'PaeseProduzione', 'Regista', 'LivelloContenuto']]
     df['Id'] = df['Id'] - 1
 
     return Tabella("film", df)
@@ -289,6 +290,23 @@ def genera_parte():
     df['Film'] = df['Film'] - 1
     df['Attore'] = 3 * df['Attore'] 
     return Tabella("parte", df)
+
+def genera_parte():
+    lista_film = []
+    lista_attore = []
+    for i in range(tavola_volumi.n_Film):
+        # scegli numero di attori
+        num = np.random.poisson(tavola_volumi.num_att_per_film)
+        # scegli attori
+        att_parz = [3 * random.randint(0, tavola_volumi.n_Attore - 1) for _ in range(num)]
+        # aggiungi
+        lista_film += [i for _ in range(num)]
+        lista_attore += att_parz
+    df = pd.DataFrame({
+        'Film': lista_film,
+        'Attore': lista_attore
+    })
+    return Tabella('parte', df)
 
 
 def genera_critico():
@@ -522,6 +540,7 @@ def genera_clienti():
     df['password'] = [g_password_lunga(10) for _ in range(len(df))]
     df.rename(columns={'customer_id': 'Id', 'first_name': 'Nome',
                        'last_name': 'Cognome', 'email': 'Email', 'password': 'Password'}, inplace=True)
+    df['Email'] = df['Email'].str.replace('@sakilacustomer.org', '@gmail.com')
     df['Id'] = df.reset_index().index
     return Tabella("cliente", df)
 
@@ -917,14 +936,14 @@ def genera_visualizzazione(tabella_connessioni, tabella_file):
         lista_file = tabella_file.sample(quante_vis).reset_index(drop=True) # dataframe
         # eventuale controllo di compatibiltà con dispositivo
         file_parz = lista_file['Id'].tolist() 
-        
+
         iniz_parz = []
         fine_parz = []
         # partiziona (InizioConnessione, FineConnessione) in quante_vis parti ottenendo una lista
         in_conn, fi_conn = tabella_connessioni.loc[i, 'Inizio'], tabella_connessioni.loc[i, 'Fine']
         # trasformo in_conn fi_conn in datetime
         in_conn, fi_conn = datetime.strptime(in_conn, '%Y-%m-%d %H:%M:%S'), datetime.strptime(fi_conn, '%Y-%m-%d %H:%M:%S')
-
+        
         l_partiz = [in_conn + ii*(fi_conn - in_conn) / quante_vis for ii in range(quante_vis)]
         l_partiz.append(fi_conn)
         for ii in range(quante_vis):
@@ -964,7 +983,8 @@ def genera_recensione(tabella_visualizzazioni, tabella_file, tabella_connessioni
     # per ogni row di visualizzazioni
     for index, row in tabella_visualizzazioni.iterrows():
         # scegli se mettere una recensione o no
-        if np.random.choice([True, False], p=[0.7, 0.3]):
+        if np.random.choice([True, False], p=[tavola_volumi.num_rec_per_vis, 
+                                              1 - tavola_volumi.num_rec_per_vis]):
             # ottieni film da file
             list_film.append(tabella_file.loc[row['File'], 'Film'])
             # ottieni cliente da conn
@@ -1100,7 +1120,6 @@ def genera_NonSupportato():
 
 
 """
-
 att = genera_attore()
 # att.dataframe_to_mysql_ddl()
 att.genera_file_sql('popolamento_attore.sql')
@@ -1108,13 +1127,13 @@ att.genera_file_sql('popolamento_attore.sql')
 reg = genera_regista()
 # reg.dataframe_to_mysql_ddl()
 reg.genera_file_sql('popolamento_regista.sql')
-"""
+
 
 form = genera_formato()
 # form.dataframe_to_mysql_ddl()
 form.genera_file_sql('popolamento_formato.sql')
 
-"""
+
 cli = genera_clienti()
 # cli.dataframe_to_mysql_ddl()
 cli.genera_file_sql('popolamento_cliente.sql')
@@ -1133,7 +1152,7 @@ cr.genera_file_sql('popolamento_critico.sql')
 
 li = genera_lingua()
 # li.dataframe_to_mysql_ddl()
-li.genera_file_sql('popolamento_lingua.sql')"""
+li.genera_file_sql('popolamento_lingua.sql')
 
 conn = genera_connessione()
 # conn.dataframe_to_mysql_ddl()
@@ -1179,3 +1198,7 @@ files = genera_file(form.df, film.df)
 # files.dataframe_to_mysql_ddl()
 files.genera_file_sql('popolamento_file.sql')
 
+"""
+
+
+part = genera_parte()
