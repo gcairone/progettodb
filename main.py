@@ -5,6 +5,7 @@ import tavola_volumi
 import numpy as np
 from datetime import datetime, timedelta
 import pandas as pd
+import os
 
 def generate_random_time_in_range(start_time, end_time):
     time_range = end_time - start_time
@@ -64,11 +65,56 @@ def g_nomi(num):
     return prodotto_cartesiano
 
 
-def g_random_ip():
-    ip_parts = [str(random.randint(0, 255)) for _ in range(4)]
+def g_random_ip(start, end):
+    start_l = start.split('.')
+    end_l = end.split('.')
+    start_l = [int(e) for e in start_l]
+    end_l = [int(e) for e in end_l]
 
-    ip = ".".join(ip_parts)
+    
+    ip_parts = []
+    for s, e in zip(start_l, end_l):
+        if s <= e:
+            ip_parts.append(random.randint(s, e))
+        else:
+            ip_parts.append(random.randint(0, 255))
+    ip = ".".join([str(e) for e in ip_parts])
     return ip
+
+
+def g_paese_casuale():
+    lista_codici = ['AF', 'AL', 'DZ', 'AS', 'AD', 'AO', 'AI', 'AG', 'AR', 'AM', 'AW', 
+             'AU', 'AT', 'AZ', 'BS', 'BH', 'BD', 'BB', 'BY', 'BE', 'BZ', 'BJ', 
+             'BM', 'BT', 'BO', 'BQ', 'BA', 'BW', 'BR', 'BN', 'BG', 'BF', 'BI', 
+             'CV', 'KH', 'CM', 'CA', 'KY', 'CF', 'TD', 'CL', 'CN', 'CX', 'CO', 
+             'KM', 'CG', 'CD', 'CK', 'CR', 'CI', 'HR', 'CU', 'CW', 'CY', 'CZ', 
+             'DK', 'DJ', 'DM', 'DO', 'EC', 'EG', 'SV', 'GQ', 'ER', 'EE', 'SZ', 
+             'ET', 'FK', 'FO', 'FJ', 'FI', 'FR', 'GF', 'PF', 'GA', 'GM', 'GE', 
+             'DE', 'GH', 'GI', 'GR', 'GL', 'GD', 'GP', 'GU', 'GT', 'GN', 'GW', 
+             'GY', 'HT', 'VA', 'HN', 'HK', 'HU', 'IS', 'IN', 'ID', 'IR', 'IQ', 
+             'IE', 'IM', 'IL', 'IT', 'JM', 'JP', 'JE', 'JO', 'KZ', 'KE', 'KI', 
+             
+             'KP', 'KR', 'KW', 'KG', 'LA', 'LV', 'LB', 'LS', 'LR', 'LY', 'LI', 
+             'LT', 'LU', 'MO', 'MG', 'MW', 'MY', 'MV', 'ML', 'MT', 'MH', 'MQ', 
+             'MR', 'MU', 'YT', 'MX', 'FM', 'MD', 'MC', 'MN', 'ME', 'MS', 'MA', 
+             'MZ', 'MM', 'NA', 'NR', 'NP', 'NL', 'NC', 'NZ', 'NI', 'NE', 'NG', 
+             'NU', 'NF', 'MK', 'MP', 'NO', 'OM', 'PK', 'PW', 'PA', 'PG', 'PY', 
+             'PE', 'PH', 'PN', 'PL', 'PT', 'PR', 'QA', 'RE', 'RO', 'RU', 'RW', 
+             'BL', 'SH', 'KN', 'LC', 'MF', 'PM', 'VC', 'WS', 'SM', 'ST', 'SA', 
+             'SN', 'RS', 'SC', 'SL', 'SG', 'SX', 'SK', 'SI', 'SB', 'SO', 'ZA', 
+             'GS', 'SS', 'ES', 'LK', 'SD', 'SR', 'SE', 'CH', 'SY', 'TW', 'TJ', 
+             'TZ', 'TH', 'TL', 'TG', 'TO', 'TT', 'TN', 'TR', 'TM', 'TC', 'TV', 
+             'UG', 'UA', 'AE', 'GB', 'US', 'UY', 'UZ', 'VU', 'VE', 'VN', 'VG', 
+             'VI', 'WF', 'YE', 'ZM', 'ZW', 'XG', 'XK', 'XR', 'XW']
+    lista_codici += ['US' for _ in range(70)]
+    lista_codici += ['GB' for _ in range(50)]
+    lista_codici += ['JP' for _ in range(40)]
+    lista_codici += ['CN' for _ in range(30)]
+    lista_codici += ['IT' for _ in range(15)]
+    lista_codici += ['ES' for _ in range(10)]
+    lista_codici += ['DE' for _ in range(5)]
+    lista_codici += ['IN' for _ in range(5)]
+    return random.choice(lista_codici)
 
 
 # funzione di utilità da usare dentro genera sql
@@ -198,12 +244,12 @@ def genera_server():
 
 
 def genera_pianoTariffario():
-    data = [{'Nome': "Basic", 'Prezzo': 4.99, 'Contenuti': 'Standard', 'Pubblicità': 'Sì', 'QualitàMax': 'standard'},
-            {'Nome': "Premium", 'Prezzo': 7.99, 'Contenuti': 'Standard', 'Pubblicità': 'Poca', 'QualitàMax': 'HD'},
-            {'Nome': "Pro", 'Prezzo': 10.99, 'Contenuti': 'Tutti', 'Pubblicità': 'Poca', 'QualitàMax': 'HD'},
-            {'Nome': "Deluxe", 'Prezzo': 13.99, 'Contenuti': 'Tutti', 'Pubblicità': 'Nessuna', 'QualitàMax': 'UltraHD'},
-            {'Nome': "Ultimate", 'Prezzo': 16.99, 'Contenuti': 'Extra', 'Pubblicità': 'Nessuna',
-             'QualitàMax': 'UltraHD'}]
+    data = [{'Nome': "Basic", 'Prezzo': 4.99, 'Contenuti': 'Standard', 'Pubblicita': 'Si', 'QualitaMax': 'standard'},
+            {'Nome': "Premium", 'Prezzo': 7.99, 'Contenuti': 'Standard', 'Pubblicita': 'Poca', 'QualitaMax': 'HD'},
+            {'Nome': "Pro", 'Prezzo': 10.99, 'Contenuti': 'Tutti', 'Pubblicita': 'Poca', 'QualitaMax': 'HD'},
+            {'Nome': "Deluxe", 'Prezzo': 13.99, 'Contenuti': 'Tutti', 'Pubblicita': 'Nessuna', 'QualitaMax': 'UltraHD'},
+            {'Nome': "Ultimate", 'Prezzo': 16.99, 'Contenuti': 'Extra', 'Pubblicita': 'Nessuna',
+             'QualitaMax': 'UltraHD'}]
     return Tabella("pianoTariffario", pd.DataFrame(data))
 
 
@@ -540,6 +586,7 @@ def genera_clienti():
     df['Id'] = df.reset_index().index
     df['Abbonamento'] = None
     df['Scadenza'] = None
+    df['Paese'] = g_paese_casuale()
     return Tabella("cliente", df)
 
 
@@ -707,15 +754,21 @@ def genera_sottoscrizione(cart):
 
 
 def genera_connessione():
+    # prende in input la tabella degli iprange 
     list_cl = []
     list_ip = []
     list_disp = []
     list_in = []
     list_fin = []
+    list_paes = []
+    iprange = pd.read_csv('dataset-iprange.csv')
     for i in range(tavola_volumi.n_Cliente):
+        riga_ip = iprange.iloc[random.randint(0, len(iprange) - 1)]
         quanti_ip, quanti_disp = random.choices([1, 2], weights=[0.9, 0.1])[0], random.choice([1, 2])
+
         # liste di ip e disp "preferiti" del cliente
-        ip_scelti = [g_random_ip() for _ in range(quanti_ip)]
+        ip_scelti = [g_random_ip(riga_ip['Start'], riga_ip['End']) for _ in range(quanti_ip)]
+        #print(riga_ip['Start'], riga_ip['End'])
         disp_scelti = [random.randint(0, tavola_volumi.n_Dispositivo - 1) for _ in range(quanti_disp)]
 
         # scegli len_l1, len_l2 tali che 2*len_l2 + len_l1 = num_conn_per_cliente * num_mesi
@@ -775,19 +828,20 @@ def genera_connessione():
         list_disp += [random.choice(disp_scelti) for _ in range((len(l1) + 2 * len(l2)))]
         list_in += iniz_parz
         list_fin += fin_parz
+        list_paes += [riga_ip['Paese'] for _ in range((len(l1) + 2 * len(l2)))]
     # Connessione(*Id, IP, Dispositivo, Cliente, Inizio, Fine)
     df = pd.DataFrame({
         'IP': list_ip,
         'Dispositivo': list_disp,
         'Cliente': list_cl,
         'Inizio': list_in,
-        'Fine': list_fin
+        'Fine': list_fin,
+        'Paese': list_paes
     })
     df['Inizio'] = df['Inizio'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
     df['Fine'] = df['Fine'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
     df['Id'] = df['Id'] = df.reset_index().index
     df['Server'] = None
-    df['Paese'] = None
     df = df[['Id', 'IP', 'Dispositivo', 'Cliente', 'Inizio', 'Fine', 'Server', 'Paese']]
     return Tabella('connessione', df)
 
@@ -1053,92 +1107,151 @@ def genera_NonSupportato():
 
 
 
+def Popola_tutto():
+    att = genera_attore()
+    # att.dataframe_to_mysql_ddl()
+    att.genera_file_sql('popolamento_attore.sql')
+
+    reg = genera_regista()
+    # reg.dataframe_to_mysql_ddl()
+    reg.genera_file_sql('popolamento_regista.sql')
+
+    form = genera_formato()
+    # form.dataframe_to_mysql_ddl()
+    form.genera_file_sql('popolamento_formato.sql')
+
+    disp = genera_dispositivo()
+    # disp.dataframe_to_mysql_ddl()
+    disp.genera_file_sql('popolamento_dispositivo.sql')
+
+    pia = genera_pianoTariffario()
+    # pia.dataframe_to_mysql_ddl()
+    pia.genera_file_sql('popolamento_pianotariffario.sql')
+
+    cr = genera_critico()
+    # cr.dataframe_to_mysql_ddl()
+    cr.genera_file_sql('popolamento_critico.sql')
+
+    li = genera_lingua()
+    # li.dataframe_to_mysql_ddl()
+    li.genera_file_sql('popolamento_lingua.sql')
+
+    cli = genera_clienti()
+    # cli.dataframe_to_mysql_ddl()
+    cli.genera_file_sql('popolamento_cliente.sql')
+
+    cart = genera_carteDiCredito()
+    # cart.dataframe_to_mysql_ddl()
+    cart.genera_file_sql('popolamento_cartadicredito.sql')
+
+    nons = genera_NonSupportato()
+    # nons.dataframe_to_mysql_ddl()
+    nons.genera_file_sql('popolamento_nonsupportato.sql')
+
+    film = genera_film()
+    # film.dataframe_to_mysql_ddl()
+    film.genera_file_sql('popolamento_film.sql')
+
+    sott = genera_sottoscrizione(cart.df)
+    # sott.dataframe_to_mysql_ddl()
+    sott.genera_file_sql('popolamento_sottoscrizione.sql')
+
+    part = genera_parte()
+    # part.dataframe_to_mysql_ddl()
+    part.genera_file_sql('popolamento_parte.sql')
+
+    premio = genera_premio(film.df)
+    # premio.dataframe_to_mysql_ddl()
+    premio.genera_file_sql('popolamento_premio.sql')
+
+    linguaa = genera_lingueAudio()
+    # linguaa.dataframe_to_mysql_ddl()
+    linguaa.genera_file_sql('popolamento_linguaaudio.sql')
+
+    linguas = genera_linguaSottotitoli()
+    # linguas.dataframe_to_mysql_ddl()
+    linguas.genera_file_sql('popolamento_linguasottotitoli.sql')
+
+    cra = genera_critica()
+    # cra.dataframe_to_mysql_ddl()
+    cra.genera_file_sql('popolamento_critica.sql')
+
+    files = genera_file(form.df, film.df)
+    # files.dataframe_to_mysql_ddl()
+    files.genera_file_sql('popolamento_file.sql')
+
+    conn = genera_connessione()
+    # conn.dataframe_to_mysql_ddl()
+    conn.genera_file_sql('popolamento_connessione.sql')
 
 
-att = genera_attore()
-# att.dataframe_to_mysql_ddl()
-att.genera_file_sql('popolamento_attore.sql')
-
-reg = genera_regista()
-# reg.dataframe_to_mysql_ddl()
-reg.genera_file_sql('popolamento_regista.sql')
-
-form = genera_formato()
-# form.dataframe_to_mysql_ddl()
-form.genera_file_sql('popolamento_formato.sql')
+    vis = genera_visualizzazione(conn.df, files.df)
+    vis.genera_file_sql('popolamento_visualizzazione.sql')
 
 
-disp = genera_dispositivo()
-# disp.dataframe_to_mysql_ddl()
-disp.genera_file_sql('popolamento_dispositivo.sql')
-
-pia = genera_pianoTariffario()
-# pia.dataframe_to_mysql_ddl()
-pia.genera_file_sql('popolamento_pianotariffario.sql')
-
-cr = genera_critico()
-# cr.dataframe_to_mysql_ddl()
-cr.genera_file_sql('popolamento_critico.sql')
-
-li = genera_lingua()
-# li.dataframe_to_mysql_ddl()
-li.genera_file_sql('popolamento_lingua.sql')
-
-cli = genera_clienti()
-# cli.dataframe_to_mysql_ddl()
-cli.genera_file_sql('popolamento_cliente.sql')
-
-cart = genera_carteDiCredito()
-# cart.dataframe_to_mysql_ddl()
-cart.genera_file_sql('popolamento_cartadicredito.sql')
-
-nons = genera_NonSupportato()
-# nons.dataframe_to_mysql_ddl()
-nons.genera_file_sql('popolamento_nonsupportato.sql')
-
-film = genera_film()
-# film.dataframe_to_mysql_ddl()
-film.genera_file_sql('popolamento_film.sql')
-
-sott = genera_sottoscrizione(cart.df)
-# sott.dataframe_to_mysql_ddl()
-sott.genera_file_sql('popolamento_sottoscrizione.sql')
-
-part = genera_parte()
-# part.dataframe_to_mysql_ddl()
-part.genera_file_sql('popolamento_parte.sql')
-
-premio = genera_premio(film.df)
-# premio.dataframe_to_mysql_ddl()
-premio.genera_file_sql('popolamento_premio.sql')
-
-linguaa = genera_lingueAudio()
-# linguaa.dataframe_to_mysql_ddl()
-linguaa.genera_file_sql('popolamento_linguaaudio.sql')
-
-linguas = genera_linguaSottotitoli()
-# linguas.dataframe_to_mysql_ddl()
-linguas.genera_file_sql('popolamento_linguasottotitoli.sql')
-
-cra = genera_critica()
-# cra.dataframe_to_mysql_ddl()
-cra.genera_file_sql('popolamento_critica.sql')
-
-files = genera_file(form.df, film.df)
-# files.dataframe_to_mysql_ddl()
-files.genera_file_sql('popolamento_file.sql')
-
-conn = genera_connessione()
-# conn.dataframe_to_mysql_ddl()
-conn.genera_file_sql('popolamento_connessione.sql')
+    rec = genera_recensione(vis.df, files.df, conn.df)
+    rec.genera_file_sql('popolamento_recensione.sql')
 
 
-vis = genera_visualizzazione(conn.df, files.df)
-vis.genera_file_sql('popolamento_visualizzazione.sql')
+def unisci_file_sql(output_file_name, file_names_to_merge):
+ 
+    directory_path = r'C:\\Users\\Giuseppe\\Desktop\\progetto_DB\\scripts\\'
+
+    # Inizializza il contenuto del file di output
+    merged_content = ""
+
+    # Scansiona tutti i file nella directory
+    for filename in file_names_to_merge:
+        if filename.endswith(".sql"):
+            # Leggi il contenuto del file .sql e aggiungilo al contenuto unito
+            file_path = os.path.join(directory_path, filename)
+            with open(file_path, "r") as file:
+                file_content = file.read()
+                merged_content += file_content
+
+    # Costruisci il percorso completo per il file di output nella stessa directory
+    output_file_path = os.path.join(directory_path, output_file_name)
+
+    # Scrivi il contenuto unito in un file di output .sql nella stessa directory
+    with open(output_file_path, "w") as output_file:
+        output_file.write(merged_content)
+
+    print(f"I file .sql selezionati sono stati uniti con successo in '{output_file_path}'.")
 
 
-rec = genera_recensione(vis.df, files.df, conn.df)
-rec.genera_file_sql('popolamento_recensione.sql')
+
+Popola_tutto()
+# DA ATTORE A NON SUPPORTATO
+unisci_file_sql("POPOLAMENTO_1.sql", ['popolamento_attore.sql', 
+                                      'popolamento_regista.sql',
+                                      'popolamento_formato.sql',
+                                      'popolamento_dispositivo.sql',
+                                      'popolamento_pianotariffario.sql',
+                                      'popolamento_critico.sql',
+                                      'popolamento_lingua.sql',
+                                      'popolamento_cliente.sql',
+                                      'popolamento_cartadicredito.sql',
+                                      'popolamento_nonsupportato.sql'])
+
+# DA PARTE A CRITICA
+unisci_file_sql("POPOLAMENTO_2.sql", ['popolamento_parte.sql', 
+                                      'popolamento_premio.sql',
+                                      'popolamento_linguasottotitoli.sql',
+                                      'popolamento_linguaaudio.sql',
+                                      'popolamento_critica.sql'])
+
+
+"""
+L'ordine diventa:
+-POPOLAMENTO_1.sql
+-popolamento_sottoscrizione.sql
+-popolamento_film.sql
+-POPOLAMENTO_2.sql
+-popolamento_file.sql
+-popolamento_connessione.sql
+-popolamento_visualizzazione.sql
+-popolamento_recensione.sql
+"""
 
 
 

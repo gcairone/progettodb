@@ -68,8 +68,8 @@ CREATE TABLE pianoTariffario (
     Nome VARCHAR(20) PRIMARY KEY,
     Prezzo FLOAT,
     Contenuti VARCHAR(30),
-    Pubblicità VARCHAR(30),
-    QualitàMax VARCHAR(30)
+    Pubblicita VARCHAR(30),
+    QualitaMax VARCHAR(30)
 );
 CREATE TABLE critico (
     Id INT PRIMARY KEY,
@@ -88,7 +88,9 @@ CREATE TABLE cliente (
     Password VARCHAR(32),
     Abbonamento VARCHAR(20),
     Scadenza TIMESTAMP,
-    FOREIGN KEY (Abbonamento) REFERENCES pianotariffario(Nome)
+    Paese VARCHAR(10),
+    FOREIGN KEY (Abbonamento) REFERENCES pianotariffario(Nome),
+    FOREIGN KEY (Paese) REFERENCES paese(Cod)
 );
 
 
@@ -109,7 +111,6 @@ CREATE TABLE cartaDiCredito (
     FOREIGN KEY (Proprietario) REFERENCES cliente(Id)
 );
 DELIMITER //
-
 CREATE TRIGGER verifica_data_precedente_oggi
 BEFORE INSERT ON cartaDiCredito FOR EACH ROW
 BEGIN
@@ -117,7 +118,6 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La carte è scaduta';
   END IF;
 END; //
-
 DELIMITER ;
 CREATE TABLE nonSupportato (
     Formato INT,
@@ -146,19 +146,47 @@ CREATE TABLE sottoscrizione (
     FOREIGN KEY (PianoTariffario) REFERENCES pianotariffario(Nome)
 );
 DELIMITER //
-
-CREATE TRIGGER verifica_scadenza_carta
+CREATE TRIGGER trg_sottoscrizione
 BEFORE INSERT ON sottoscrizione FOR EACH ROW
 BEGIN
     DECLARE data_scadenza DATE;
+    DECLARE pagante INT;
     SELECT DataScadenza INTO data_scadenza FROM cartaDiCredito WHERE Numero = NEW.cartadiCredito;
     
-    IF data_scadenza < CURDATE() THEN
+    IF data_scadenza < NEW.Data THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La carta di credito è scaduta';
     END IF;
-END; //
 
+	SELECT Proprietario INTO pagante # cliente che paga
+    FROM cartadicredito
+    WHERE Numero = NEW.CartadiCredito;
+    
+    
+    
+	IF NEW.PianoTariffario = (
+		SELECT Abbonamento
+        FROM cliente
+        WHERE Id = pagante
+    ) THEN 
+		# (rinnovo) caso in cui un cliente ha un abbonamento attivo uguale a quello che si sta inserendo
+		# aggiorna scadenza aumentandola di 30
+		UPDATE cliente SET Scadenza = date_add(Scadenza, INTERVAL 30 DAY) WHERE cliente.Id = pagante;
+	ELSE 
+		# tutti gli altri casi (cambio piano, nuovo cliente, cliente con piano scaduto)
+		UPDATE cliente SET Scadenza = date_add(NEW.Data, INTERVAL 30 DAY) WHERE cliente.Id = pagante;
+		UPDATE cliente SET Abbonamento = NEW.PianoTariffario WHERE cliente.Id = pagante;
+    END IF;
+
+
+																		
+    # negli altri casi
+    # aggiorna abbonamento
+    # aggiorna scadenza mettendo la data + 30 giorni
+																
+																
+																
+END; //
 DELIMITER ;
 CREATE TABLE film (
     Id INT PRIMARY KEY,
@@ -273,16 +301,25 @@ CREATE TABLE connessione (
     FOREIGN KEY (Server) REFERENCES server(Id),
     FOREIGN KEY (Paese) REFERENCES paese(Cod)
 );
-
-
-
-
-
-
-
-
-
-
+/*
+DELIMITER //
+CREATE TRIGGER trg_ins_conn # trigger mette il paese
+BEFORE INSERT ON Connessione
+FOR EACH ROW
+BEGIN
+    DECLARE paese_cod VARCHAR(10);
+    SELECT GetCountryByIP(NEW.IP) INTO paese_cod;
+    IF paese_cod IS NULL THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'IP non associato a nessun paese';
+	ELSE 
+		SET NEW.Paese = paese_cod;
+	END IF;
+    
+END;
+//
+DELIMITER ;
+*/
 
 # viene verificata l'esistenza della connessione, e la compatibilità tra inizi e fine
 # non viene verificata la presenza di un file nel server (anche perchè nel durante il popolamento generale non ha senso)
@@ -305,6 +342,7 @@ BEGIN
     DECLARE conn_inizio DATETIME;
     DECLARE conn_fine DATETIME;
     DECLARE film_file INT;
+    DECLARE bitrate_file INT;
 
     -- Ottieni l'inizio e la fine della connessione corrispondente
     SELECT Inizio, Fine INTO conn_inizio, conn_fine
@@ -332,7 +370,7 @@ BEGIN
     SELECT Film INTO film_file
     FROM File
     WHERE NEW.File = File.Id;
-    
+    # aggiorna numero visualizzazioni
     UPDATE film
 	SET nVisualizzazioni = nVisualizzazioni + 1
 	WHERE Id = film_file;
@@ -387,3 +425,9 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+
+
+
+
+

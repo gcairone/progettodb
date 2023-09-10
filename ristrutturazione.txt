@@ -91,33 +91,29 @@ OUTPUT: Record nella tabella Connessione
 INPUT: Connessione, Server
 OUTPUT: distanza tra il paese associato alla connessione e il server
 
-3) Ricerca del server migliore
-INPUT: Visualizzazione
-OUTPUT: Server migliore
-
-4) Richiesta visualizzazione
+3) Richiesta visualizzazione
 INPUT: Connessione, Film
 OUTPUT: Record nella tabella Visualizzazione
 
-5) Raccomandazione contenuti
+4) Raccomandazione contenuti
 INPUT: Persona, Film
 OUTPUT: Punteggio
 
-6) Sposta File per evitare sovraccarico
-INPUT: Cambio Connessione
-OUTPUT: Spostamento del file
-
-7) Inserimento sottoscrizione
+5) Inserimento sottoscrizione
 INPUT: CartadiCredito, PianoTariffario
 OUTPUT: Record nella tabella sottoscrizione
 
-8) Inserimento recensione
+6) Inserimento recensione
 INPUT: Persona, Film
 OUTPUT: Record nella tabella recensione
 
-9) Caching 
+7) Caching 
 INPUT: -
 OUTPUT: Spostamento dei file
+
+8) Inserimento file
+INPUT: Film, formato
+OUTPUT: Record di film (con scelta del server)
 
 
 
@@ -130,7 +126,7 @@ RIDONDANZE DA VALUTARE
 5) Numero visualizzazioni
 6) Rating medio
 7) Carico server
-8) Rating per ogni coppia persona-film
+8) Rating per ogni coppia persona-film    NON SI METTE
 
 
 Le tabelle degli accessi sono su analisi_prestazioni.py
@@ -201,7 +197,7 @@ POSSIBILE TRADUZIONE NEL MODELLO LOGICO
 -senza verifica bcnf
 
 AREA CONTENUTI
-	Film(*Id, Titolo, Descrizione, Genere, Durata, AnnoProduzione, PaeseProduzione, Regista)	
+	Film(*Id, Titolo, Descrizione, Genere, Durata, AnnoProduzione, PaeseProduzione, Regista, LivelloContenuto, nVisualizzazioni, RatingMedio)	
 	Attore(*Id, Nome, Cognome)
 	Regista(*Id, Nome, Cognome)
 	Premio(*Nome, *Categoria, *Anno, Film)
@@ -219,14 +215,14 @@ AREA FORMATI
 	NonSupportato(*File, *Paese)
 
 AREA CLIENTI
-	Cliente(*Id, Nome, Cognome, Email, Password)
+	Cliente(*Id, Nome, Cognome, Email, Password, Abbonamento, Scadenza)
 	CartaDiCredito(*Numero, DataScadenza, Circuito, Proprietario)
 	PianoTariffario(*Nome, Prezzo, ContenutiDisponibili, Pubblicità, QualitàMassima)
 	Sottoscrizione(*CartadiCredito, *PianoTariffario, *Data)
 
 AREA CDN
-	Server(*Id, AreaGeografica, Banda, Capacità, Lat, Lng)
-	Connessione(*Id, IP, Dispositivo, Cliente, Inizio, Fine, Server)
+	Server(*Id, AreaGeografica, Banda, Capacità, Lat, Lng, Carico)
+	Connessione(*Id, IP, Dispositivo, Cliente, Inizio, Fine, Server, Paese)
 	Dispositivo(*Id, AziendaProduttrice, Modello, Anno, RAM, nCore, fProcessore, pOrizzonali, pVerticali)
 	Visualizzazione(*Connessione, *File, *Inizio, Fine)
 	IPrange(*Start, End, Paese)
@@ -286,8 +282,8 @@ Server:
 	AreaGeografica -> tuttelealtre}
 	BCNF
 Connessione:
-	{id -> tutte le altre}
-	BCNF
+	{id -> tutte le altre, IP -> Paese}
+	NON BCNF
 Dispositivo:
 	{id -> tutte le altre
 	Azienda, Dispositivo -> tutte le altre}
@@ -304,7 +300,9 @@ Sottoscrizione:
 
 
 
-File si decompone in 
+Connessione non è in bcnf, ma va bene lo stesso
+
+File si decompone in :
 
 File(*Id, nomeFormato, DataInserimento, dimensione, durata, film)
 Formato(nomeFormato*, Risoluzione, Bitrate, qAudio, qVideo, Rapporto)
@@ -319,7 +317,7 @@ POSSIBILE TRADUZIONE NEL MODELLO LOGICO
 
 tabelle 
 AREA CONTENUTI
-	Film(*Id, Titolo, Descrizione, Genere, Durata, AnnoProduzione, PaeseProduzione, Regista)	
+	Film(*Id, Titolo, Descrizione, Genere, Durata, AnnoProduzione, PaeseProduzione, Regista, LivelloContenuto, nVisualizzazioni, RatingMedio)	
 	Attore(*Id, Nome, Cognome)
 	Regista(*Id, Nome, Cognome)
 	Premio(*Nome, *Categoria, *Anno, Film)
@@ -327,25 +325,25 @@ AREA CONTENUTI
 	Critico(*Id, Nome, Cognome)
 	Lingua(*Nome)
 	Parte(*Film, *Attore)
-	Recensione(*Film, *Cliente, Votazione, data)
+	Recensione(*Film, *Cliente, Voto, data)
 	Critica(*Film, *Critico, Voto, Data)
 	LinguaAudio(*Lingua, *Film)
 	LinguaSottotitoli(*Lingua, *Film)
 
 AREA FORMATI
 	File(*Id, Formato, DataInserimento, Dimensione, Durata, Film, Server)
-	Formato(Id, NomeFormato, Risoluzione, Bitrate, qAudio, qVideo, Rapporto)
+	Formato(Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo)
 	NonSupportato(*Formato, *Paese)
 
 AREA CLIENTI
-	Cliente(*Id, Nome, Cognome, Email, Password)
+	Cliente(*Id, Nome, Cognome, Email, Password, Abbonamento, Scadenza)
 	CartaDiCredito(*Numero, DataScadenza, Circuito, Proprietario)
 	PianoTariffario(*Nome, Prezzo, ContenutiDisponibili, Pubblicità, QualitàMassima)
 	Sottoscrizione(*CartadiCredito, *PianoTariffario, *Data)
 
 AREA CDN
-	Server(*Id, AreaGeografica, Banda, Capacità, Lat, Lng)
-	Connessione(*Id, IP, Dispositivo, Cliente, Inizio, Fine, Server)
+	Server(*Id, AreaGeografica, Banda, Capacità, Lat, Lng, Carico)
+	Connessione(*Id, IP, Dispositivo, Cliente, Inizio, Fine, Server, Paese)
 	Dispositivo(*Id, AziendaProduttrice, Modello, Anno, RAM, nCore, fProcessore, pOrizzonali, pVerticali)
 	Visualizzazione(*Connessione, *File, *Inizio, Fine)
 	IPrange(*Start, End, Paese)
