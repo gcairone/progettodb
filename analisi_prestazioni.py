@@ -97,6 +97,7 @@ rat_medio = Ridondanza(n='Rating madio di ogni film')
 car_serv = Ridondanza(n='Carico server')
 rat_coppie = Ridondanza(n='Rating per ogni coppia persona-film')
 
+# INSERIMENTO CONNESSIONE
 
 # tabella accessi Inserimento Connessione senza_rid
 tabella = pd.DataFrame([
@@ -135,8 +136,7 @@ paese_conn.op_agg.append(ins_conn)
 
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-
-
+#CALCOLA DISTANZA
 
 # tabella accessi Calcola Distanza senza rid
 tabella = pd.DataFrame([
@@ -170,21 +170,7 @@ paese_conn.op_risp.append(calc_dist)
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-
-
-# tabella accessi ricerca del server migliore senza rid
-tabella = pd.DataFrame([ # la visualizzazione, mi servono distanza e carico
-    ['Visualizzazione'],
-    ['Connessione'],
-    ['IPrange'],
-    ['Localizzazione'],
-    ['Paese'], # a questo punto ho le coordinate del paese
-    ['Server'], # a questo punto ho le distanze
-    ['Connessione'],
-    ['ConnessioneServer'],
-    ['Server'] # a quetso punto ho il carico
-], columns=['Nome', 'Tipo', 'Accesso', 'Numero', 'Descrizione'])
-ric_best_server.tavole_Accessi.append({'Ridonanza': None, 'Tabella': tabella})
+# RICERCA DEL SERVER MIGLIORE
 
 # tabella accessi ricerca del server migliore senza rid
 tabella = pd.DataFrame([ # la visualizzazione, mi servono distanza e carico
@@ -200,8 +186,83 @@ tabella = pd.DataFrame([ # la visualizzazione, mi servono distanza e carico
 ], columns=['Nome', 'Tipo', 'Accesso', 'Numero', 'Descrizione'])
 ric_best_server.tavole_Accessi.append({'Ridonanza': None, 'Tabella': tabella})
 
+# tabella accessi ricerca del server migliore senza rid
+tabella = pd.DataFrame([ # la visualizzazione, mi servono distanza e carico
+    ['Visualizzazione'],
+    ['Connessione'],
+    ['IPrange'],
+    ['Localizzazione'],
+    ['Paese'], # a questo punto ho le coordinate del paese
+    ['Server'], # a questo punto ho le distanze
+    ['Connessione'],
+    ['ConnessioneServer'],
+    ['Server'] # a quetso punto ho il carico
+], columns=['Nome', 'Tipo', 'Accesso', 'Numero', 'Descrizione'])
+ric_best_server.tavole_Accessi.append({'Ridonanza': None, 'Tabella': tabella})
 
 
+"""
+ins sott SENZA rid
+ins sott CON abbonamento
+rich vis SENZA rid
+rich vis CON abbonamento
+
+#ins sott SENZA rid     
+ins sott CON scadenza
+ins conn SENZA rid
+ins conn CON scadenza
+#rich vis SENZA rid
+rich vis CON scadenza
+
+calc dist SENZA rid
+calc dist CON distanza
+ric best SENZA rid
+ric best CON distanza --
+#rich vis SENZA rid
+rich vis CON distanza --
+sposta file SENZA rid
+sposta file CON distanza --
+
+#ins conn SENZA rid
+ins conn CON paese conn
+#ric best SENZA rid
+ric best CON paese conn
+#rich vis SENZA rid
+rich vis CON paese conn --
+#sposta file SENZA rid
+sposta file CON paese conn -- 
+
+#rich vis SENZA rid
+rich vis CON nVis
+racc cont SENZA rid
+racc cont CON nVis
+caching SENZA rid
+caching CON nVis --
+
+ins rec SENZA rid
+ins rec CON rat_medio
+#racc cont SENZA rid
+racc cont CON rat_medio
+#caching SENZA rid
+caching CON rat_medio --
+
+
+#rich vis SENZA rid
+rich vis CON car_server --
+#ric best SENZA rid
+ric best CON car_server
+#sposta file SENZA rid
+sposta file CON car_server --
+
+#ins rec SENZA rid
+ins rec CON rating_coppie
+#racc cont SENZA rid
+racc cont CON rating_coppie
+#caching SENZA rid
+caching CON rating_coppie --
+
+
+"""
 
 
 

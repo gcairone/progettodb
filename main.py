@@ -171,28 +171,29 @@ class Tabella:
 
 
 def genera_server():
-    
+    # banda e capacità in Mbs
     data = [
-        {'Id': 0, 'AreaGeografica': 'Australia and New Zealand', 'Lat':-33, 'Lng': 150, 'Banda':1, 'Capacità':1},
-        {'Id': 1, 'AreaGeografica': 'Central Asia', 'Lat':50, 'Lng': 70, 'Banda':1, 'Capacità':1},
-        {'Id': 2, 'AreaGeografica': 'Eastern Asia', 'Lat':28, 'Lng': 120, 'Banda':1, 'Capacità':1},
-        {'Id': 3, 'AreaGeografica': 'Eastern Europe', 'Lat':45, 'Lng': 26, 'Banda':1, 'Capacità':1},
-        {'Id': 4, 'AreaGeografica': 'Latin America and the Caribbean', 'Lat':3, 'Lng': -70, 'Banda':1, 'Capacità':1},
-        {'Id': 5, 'AreaGeografica': 'Melanesia', 'Lat':-5, 'Lng': 143, 'Banda':1, 'Capacità':1},
-        {'Id': 6, 'AreaGeografica': 'Micronesia', 'Lat':14, 'Lng': 145, 'Banda':1, 'Capacità':1},
-        {'Id': 7, 'AreaGeografica': 'Northern Africa', 'Lat':34, 'Lng': 9, 'Banda':1, 'Capacità':1},
-        {'Id': 8, 'AreaGeografica': 'Northern America', 'Lat':33, 'Lng': -82, 'Banda':1, 'Capacità':1},
-        {'Id': 9, 'AreaGeografica': 'Northern Europe', 'Lat':55, 'Lng': 11, 'Banda':1, 'Capacità':1},
-        {'Id': 10, 'AreaGeografica': 'Polynesia', 'Lat':-16, 'Lng': -151, 'Banda':1, 'Capacità':1},
-        {'Id': 11, 'AreaGeografica': 'South-eastern Asia', 'Lat':15, 'Lng': 103, 'Banda':1, 'Capacità':1},
-        {'Id': 12, 'AreaGeografica': 'Southern Asia', 'Lat':19, 'Lng': 73, 'Banda':1, 'Capacità':1},
-        {'Id': 13, 'AreaGeografica': 'Southern Europe', 'Lat':42, 'Lng': 12, 'Banda':1, 'Capacità':1},
-        {'Id': 14, 'AreaGeografica': 'Sub-Saharan Africa', 'Lat':-6, 'Lng': 24, 'Banda':1, 'Capacità':1},
-        {'Id': 15, 'AreaGeografica': 'Western Asia', 'Lat':40, 'Lng': 35, 'Banda':1, 'Capacità':1},
-        {'Id': 16, 'AreaGeografica': 'Western Europe', 'Lat':48, 'Lng': 1, 'Banda':1, 'Capacità':1},
+        {'Id': 0, 'AreaGeografica': 'Australia and New Zealand', 'Lat':-33, 'Lng': 150, 'Banda':502, 'Capacità':402},
+        {'Id': 1, 'AreaGeografica': 'Central Asia', 'Lat':50, 'Lng': 70, 'Banda':567, 'Capacità':531},
+        {'Id': 2, 'AreaGeografica': 'Eastern Asia', 'Lat':28, 'Lng': 120, 'Banda':432, 'Capacità':400},
+        {'Id': 3, 'AreaGeografica': 'Eastern Europe', 'Lat':45, 'Lng': 26, 'Banda':344, 'Capacità':311},
+        {'Id': 4, 'AreaGeografica': 'Latin America and the Caribbean', 'Lat':3, 'Lng': -70, 'Banda':588, 'Capacità':522},
+        {'Id': 5, 'AreaGeografica': 'Melanesia', 'Lat':-5, 'Lng': 143, 'Banda':230, 'Capacità':200},
+        {'Id': 6, 'AreaGeografica': 'Micronesia', 'Lat':14, 'Lng': 145, 'Banda':340, 'Capacità':320},
+        {'Id': 7, 'AreaGeografica': 'Northern Africa', 'Lat':34, 'Lng': 9, 'Banda':450, 'Capacità':422},
+        {'Id': 8, 'AreaGeografica': 'Northern America', 'Lat':33, 'Lng': -82, 'Banda':769, 'Capacità':700},
+        {'Id': 9, 'AreaGeografica': 'Northern Europe', 'Lat':55, 'Lng': 11, 'Banda':557, 'Capacità':498},
+        {'Id': 10, 'AreaGeografica': 'Polynesia', 'Lat':-16, 'Lng': -151, 'Banda':336, 'Capacità':298},
+        {'Id': 11, 'AreaGeografica': 'South-eastern Asia', 'Lat':15, 'Lng': 103, 'Banda':566, 'Capacità':511},
+        {'Id': 12, 'AreaGeografica': 'Southern Asia', 'Lat':19, 'Lng': 73, 'Banda':463, 'Capacità':403},
+        {'Id': 13, 'AreaGeografica': 'Southern Europe', 'Lat':42, 'Lng': 12, 'Banda':565, 'Capacità':400},
+        {'Id': 14, 'AreaGeografica': 'Sub-Saharan Africa', 'Lat':-6, 'Lng': 24, 'Banda':467, 'Capacità':400},
+        {'Id': 15, 'AreaGeografica': 'Western Asia', 'Lat':40, 'Lng': 35, 'Banda':722, 'Capacità':600},
+        {'Id': 16, 'AreaGeografica': 'Western Europe', 'Lat':48, 'Lng': 1, 'Banda':610, 'Capacità':500},
     ]
 
     df = pd.DataFrame(data)
+    df['Carico'] = 0
     return Tabella("server", df)
 
 
@@ -264,6 +265,8 @@ def genera_film():
                        'PaeseProduzione':'PaeseProduzione'}, inplace=True)
     df['AnnoProduzione'] = [random.randint(2013, 2022) for _ in range(len(df))]
     df['LivelloContenuto'] = [random.choices([0, 1, 2], weights=[0.6, 0.3, 0.1])[0] for _ in range(len(df))]
+    df['nVisualizzazioni'] = 0
+    df['RatingMedio'] = 5
     df = df[['Id', 'Titolo', 'Descrizione', 'Genere', 'Durata',
              'AnnoProduzione', 'PaeseProduzione', 'Regista', 'LivelloContenuto']]
     df['Id'] = df['Id'] - 1
@@ -284,14 +287,6 @@ def genera_attore():
 
 
 def genera_parte():
-    df = pd.read_csv("film_actor_sakila.csv")
-    df = df[['actor_id', 'film_id']]
-    df.rename(columns={'actor_id': 'Attore', 'film_id': 'Film'}, inplace=True)
-    df['Film'] = df['Film'] - 1
-    df['Attore'] = 3 * df['Attore'] 
-    return Tabella("parte", df)
-
-def genera_parte():
     lista_film = []
     lista_attore = []
     for i in range(tavola_volumi.n_Film):
@@ -306,6 +301,7 @@ def genera_parte():
         'Film': lista_film,
         'Attore': lista_attore
     })
+    df = df.drop_duplicates()
     return Tabella('parte', df)
 
 
@@ -542,6 +538,8 @@ def genera_clienti():
                        'last_name': 'Cognome', 'email': 'Email', 'password': 'Password'}, inplace=True)
     df['Email'] = df['Email'].str.replace('@sakilacustomer.org', '@gmail.com')
     df['Id'] = df.reset_index().index
+    df['Abbonamento'] = None
+    df['Scadenza'] = None
     return Tabella("cliente", df)
 
 
@@ -654,71 +652,6 @@ def genera_dispositivo():
              'pOrizzontali', 'pVerticali']]
     return Tabella("dispositivo", df)
 
-"""
-def genera_abbonamento():
-    clienti = list(range(tavola_volumi.n_Cliente))
-    piano = [random.choice(["Basic", "Premium", "Pro", "Deluxe", "Ultimate"]) for _ in range(tavola_volumi.n_Cliente)]
-
-    current_date = datetime.now()
-    start_date = current_date - timedelta(days=tavola_volumi.num_mesi * 30)  # Assuming 30 days per month
-
-    random_dates = []
-    for _ in range(tavola_volumi.n_Cliente):
-        random_timestamp = start_date + timedelta(days=random.randint(0, (current_date - start_date).days))
-        random_dates.append(random_timestamp.strftime('%Y-%m-%d %H:%M:%S'))
-    data = {
-        'Cliente': clienti,
-        'PianoTariffario': piano,
-        'DataInizio': random_dates,
-        'DataFine': None
-    }
-    return Tabella('abbonamento', pd.DataFrame(data))
-
-
-def genera_fattura(car, abb, pia):
-    # passare come parametri il dataframe di cartediCredit, quello di Abbonamento e quello di piano tariffario
-    # ipotizziamo che nel periodo tra adesso e num_mesi mesi fa tutti abbiano pagato con regolarità
-    cliente = []
-    carte = []
-    dateL = []
-    importi = []
-    # trasf da stringhe a datetime
-    abb['DataInizio'] = abb['DataInizio'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'))
-    # abb['DataFine'] = abb['DataFine'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'))
-    for i in range(tavola_volumi.n_Cliente):
-        carta = car.loc[car['Proprietario'] == i, 'Numero'].iloc[0]
-        date_list = []
-        current_date = abb.loc[abb['Cliente'] == i, 'DataInizio'].iloc[0]
-        # trasformazione in datetime
-        # current_date = datetime.strptime(current_date, '%Y-%m-%d %H:%M:%S')
-        while current_date < datetime.now():
-            date_list.append(current_date)
-            current_date += timedelta(days=30)
-        # trova in abb la riga tale che DataInizio < d < DataFine
-        abb['DataFine'] = abb['DataFine'].fillna(datetime.now())
-        piani = [abb.loc[(abb['Cliente'] == i) & (abb['DataInizio'] <= d) &
-                         (d <= abb['DataFine']), 'PianoTariffario'].iloc[0]
-                 for d in date_list]
-        # print(piani[0])
-        tariffe = [pia.loc[pia['Nome'] == pi, 'Prezzo'].iloc[0] for pi in piani]
-
-        for _ in range(len(date_list)):
-            cliente.append(i)
-            carte.append(carta)
-        dateL += date_list
-        importi += tariffe
-
-    df = pd.DataFrame({
-        'Cliente': cliente,  # lista di numeri che indicano i clienti
-        'CartadiCredito': carte,  # lista di stringhe che indicano i numeri delle carte di credito
-        'Data': dateL,  # lista di stringhe date in timestamp format
-        'Importo': importi  # lista importo del pagamento
-    })
-    df['Id'] = df['Id'] = df.reset_index().index
-    df['Data'] = df['Data'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
-    return Tabella('fattura', df)
-
-"""
 
 def genera_sottoscrizione(cart):
     # prende in input i dataframe di clienti e di carte
@@ -854,24 +787,26 @@ def genera_connessione():
     df['Fine'] = df['Fine'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
     df['Id'] = df['Id'] = df.reset_index().index
     df['Server'] = None
-    df = df[['Id', 'IP', 'Dispositivo', 'Cliente', 'Inizio', 'Fine', 'Server']]
+    df['Paese'] = None
+    df = df[['Id', 'IP', 'Dispositivo', 'Cliente', 'Inizio', 'Fine', 'Server', 'Paese']]
     return Tabella('connessione', df)
 
 
 def genera_formato():
     # senza rapporto, perchè determinato da risoluzione
     data = {
-        'nomeFormato': ['MP4', 'Formato2', 'Formato3', 'Formato4', 'Formato5',
+        'FormatoVideo': ['MP4', 'Formato2', 'Formato3', 'Formato4', 'Formato5',
+                        'Formato6', 'Formato7', 'Formato8', 'Formato9', 'Formato10'],
+        'FormatoAudio': ['MP4', 'Formato2', 'Formato3', 'Formato4', 'Formato5',
                         'Formato6', 'Formato7', 'Formato8', 'Formato9', 'Formato10'],
         'Risoluzione': ['1920x1080', '1280x720', '3840x2160', '1920x1080', '2560x1440',
                         '1280x720', '3840x2160', '1920x1080', '2560x1440', '1280x720'],
         'Bitrate': [8000, 4000, 15000, 6000, 12000, 3500, 18000, 8000, 10000, 2500],
-        'qAudio': [0.85, 0.75, 0.95, 0.80, 0.90, 0.70, 0.92, 0.82, 0.88, 0.65],
-        'qVideo': [0.90, 0.85, 0.98, 0.88, 0.92, 0.80, 0.95, 0.87, 0.90, 0.75]
+        'qVideo': ['HD', 'SD', 'UHD', 'HD', 'UHD', 'SD', 'HD', 'SD', 'HD', 'HD']
     }
     df = pd.DataFrame(data)
     df['Id'] = df.reset_index().index
-    df = df[['Id', 'nomeFormato', 'Risoluzione', 'Bitrate', 'qAudio', 'qVideo']]
+    df = df[['Id', 'FormatoVideo','FormatoAudio', 'Risoluzione', 'Bitrate', 'qVideo']]
     return Tabella('formato', df)
 
 
@@ -922,7 +857,7 @@ def genera_file(tabella_formati, tabella_film):
     df = df[['Id', 'Film', 'Formato', 'DataInserimento', 'Dimensione', 'Durata', 'Server']]
     return Tabella('file', df)
 
-
+# mettere la compatibilità con gli abbonamenti (Non si può, non posso usare l'attributo ridondante)
 def genera_visualizzazione(tabella_connessioni, tabella_file):
     # attenzione perchè inizio e fine di Connessione, non sono strighe ma datetime
     # prende in input i dataframe delle connessioni e del file
@@ -997,7 +932,7 @@ def genera_recensione(tabella_visualizzazioni, tabella_file, tabella_connessioni
     df = pd.DataFrame({
         'Film': list_film,
         'Cliente': list_cliente,
-        'Votazione': list_voto,
+        'Voto': list_voto,
         'Data': list_data
     })
     # rimuovi duplicati su Film, Cliente
@@ -1119,7 +1054,7 @@ def genera_NonSupportato():
 
 
 
-"""
+
 att = genera_attore()
 # att.dataframe_to_mysql_ddl()
 att.genera_file_sql('popolamento_attore.sql')
@@ -1128,15 +1063,10 @@ reg = genera_regista()
 # reg.dataframe_to_mysql_ddl()
 reg.genera_file_sql('popolamento_regista.sql')
 
-
 form = genera_formato()
 # form.dataframe_to_mysql_ddl()
 form.genera_file_sql('popolamento_formato.sql')
 
-
-cli = genera_clienti()
-# cli.dataframe_to_mysql_ddl()
-cli.genera_file_sql('popolamento_cliente.sql')
 
 disp = genera_dispositivo()
 # disp.dataframe_to_mysql_ddl()
@@ -1154,9 +1084,9 @@ li = genera_lingua()
 # li.dataframe_to_mysql_ddl()
 li.genera_file_sql('popolamento_lingua.sql')
 
-conn = genera_connessione()
-# conn.dataframe_to_mysql_ddl()
-conn.genera_file_sql('popolamento_connessione.sql')
+cli = genera_clienti()
+# cli.dataframe_to_mysql_ddl()
+cli.genera_file_sql('popolamento_cliente.sql')
 
 cart = genera_carteDiCredito()
 # cart.dataframe_to_mysql_ddl()
@@ -1198,7 +1128,18 @@ files = genera_file(form.df, film.df)
 # files.dataframe_to_mysql_ddl()
 files.genera_file_sql('popolamento_file.sql')
 
-"""
+conn = genera_connessione()
+# conn.dataframe_to_mysql_ddl()
+conn.genera_file_sql('popolamento_connessione.sql')
 
 
-part = genera_parte()
+vis = genera_visualizzazione(conn.df, files.df)
+vis.genera_file_sql('popolamento_visualizzazione.sql')
+
+
+rec = genera_recensione(vis.df, files.df, conn.df)
+rec.genera_file_sql('popolamento_recensione.sql')
+
+
+
+
