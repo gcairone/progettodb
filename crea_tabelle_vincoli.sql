@@ -1,5 +1,18 @@
-# crea tutte le tabelle, tranne iprange, server, paese
-# con chiavi esterne e vincoli generici
+/*
+L'ordine diventa:
+-POPOLAMENTO_1.sql
+-popolamento_sottoscrizione.sql
+-popolamento_film.sql
+-POPOLAMENTO_2.sql
+-popolamento_file.sql
+-popolamento_connessione.sql
+-popolamento_visualizzazione.sql
+-popolamento_recensione.sql
+*/
+
+
+-- Utilizza lo schema "filmSphere"
+USE filmSphere;
 /*
 CREATE TABLE server (
   Id int NOT NULL,
@@ -17,7 +30,7 @@ CREATE TABLE paese (
   AreaGeografica int DEFAULT NULL,
   Lat float DEFAULT NULL,
   Lng float DEFAULT NULL,
-  PRIMARY KEY (Cod)
+  PRIMARY KEY (Cod),
   FOREIGN KEY (AreaGeografica) REFERENCES server(Id)
 );
 CREATE TABLE iprange (
@@ -26,11 +39,7 @@ CREATE TABLE iprange (
   Paese varchar(4) DEFAULT NULL,
   PRIMARY KEY (Start),
   CONSTRAINT fk_iprange_paese FOREIGN KEY (Paese) REFERENCES paese (Cod)
-)
-
-
-
-
+);
 */
 
 
@@ -88,13 +97,10 @@ CREATE TABLE cliente (
     Password VARCHAR(32),
     Abbonamento VARCHAR(20),
     Scadenza TIMESTAMP,
-    Paese VARCHAR(10),
+    PaeseResidenza VARCHAR(10),
     FOREIGN KEY (Abbonamento) REFERENCES pianotariffario(Nome),
-    FOREIGN KEY (Paese) REFERENCES paese(Cod)
+    FOREIGN KEY (PaeseResidenza) REFERENCES paese(Cod)
 );
-
-
-
 
 
 
@@ -109,7 +115,9 @@ CREATE TABLE cartaDiCredito (
     Circuito VARCHAR(30),
     Proprietario INT,
     FOREIGN KEY (Proprietario) REFERENCES cliente(Id)
-);
+); 
+
+
 DELIMITER //
 CREATE TRIGGER verifica_data_precedente_oggi
 BEFORE INSERT ON cartaDiCredito FOR EACH ROW
@@ -119,6 +127,8 @@ BEGIN
   END IF;
 END; //
 DELIMITER ;
+
+
 CREATE TABLE nonSupportato (
     Formato INT,
     Paese VARCHAR(10),
@@ -126,6 +136,7 @@ CREATE TABLE nonSupportato (
     FOREIGN KEY (Formato) REFERENCES formato(Id),
     FOREIGN KEY (Paese) REFERENCES paese(Cod)
 );
+
 
 
 
@@ -267,6 +278,7 @@ CREATE TABLE linguaAudio (
     FOREIGN KEY (Lingua) REFERENCES lingua(Id)
 );
 CREATE TABLE critica (
+	Id INT PRIMARY KEY,
     Film INT,
     Critico INT,
     Voto INT,
@@ -320,6 +332,7 @@ END;
 //
 DELIMITER ;
 */
+
 
 # viene verificata l'esistenza della connessione, e la compatibilità tra inizi e fine
 # non viene verificata la presenza di un file nel server (anche perchè nel durante il popolamento generale non ha senso)
@@ -382,11 +395,11 @@ DELIMITER ;
 # viene verificata l'esistenza di una visualizzazione 
 # vengono aggiornate le ridondanze (rating medio)
 CREATE TABLE recensione (
+	Id INT PRIMARY KEY,
     Film INT,
     Cliente INT,       
     Voto INT,
     Data TIMESTAMP,
-    PRIMARY KEY (Film, Cliente),
     FOREIGN KEY (Film) REFERENCES film(Id),
     FOREIGN KEY (Cliente) REFERENCES cliente(Id)
 );
@@ -425,7 +438,6 @@ BEGIN
 END;
 //
 DELIMITER ;
-
 
 
 

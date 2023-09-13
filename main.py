@@ -586,7 +586,7 @@ def genera_clienti():
     df['Id'] = df.reset_index().index
     df['Abbonamento'] = None
     df['Scadenza'] = None
-    df['Paese'] = g_paese_casuale()
+    df['PaeseResidenza'] = g_paese_casuale()
     return Tabella("cliente", df)
 
 
@@ -668,6 +668,8 @@ def genera_critica():
     df = pd.DataFrame(data, columns=["Film", "Critico", "Voto", "Data"])
     df['Data'] = df['Data'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
     df['Critico'] = 3 * df['Critico'] + 2
+    df['Id'] = df.reset_index().index
+    df = df[['Id', 'Critico', 'Film', 'Voto', 'Data']]
     return Tabella("critica", df)
 
 
@@ -848,6 +850,7 @@ def genera_connessione():
 
 def genera_formato():
     # senza rapporto, perchè determinato da risoluzione
+    # bitrate in Mb
     data = {
         'FormatoVideo': ['MP4', 'Formato2', 'Formato3', 'Formato4', 'Formato5',
                         'Formato6', 'Formato7', 'Formato8', 'Formato9', 'Formato10'],
@@ -855,7 +858,7 @@ def genera_formato():
                         'Formato6', 'Formato7', 'Formato8', 'Formato9', 'Formato10'],
         'Risoluzione': ['1920x1080', '1280x720', '3840x2160', '1920x1080', '2560x1440',
                         '1280x720', '3840x2160', '1920x1080', '2560x1440', '1280x720'],
-        'Bitrate': [8000, 4000, 15000, 6000, 12000, 3500, 18000, 8000, 10000, 2500],
+        'Bitrate': [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
         'qVideo': ['HD', 'SD', 'UHD', 'HD', 'UHD', 'SD', 'HD', 'SD', 'HD', 'HD']
     }
     df = pd.DataFrame(data)
@@ -992,6 +995,9 @@ def genera_recensione(tabella_visualizzazioni, tabella_file, tabella_connessioni
     # rimuovi duplicati su Film, Cliente
     df = df.drop_duplicates(subset=['Film', 'Cliente'])
     df['Data'] = df['Data'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
+    df['Id'] = df.reset_index().index
+    df['Id'] = df['Id'] + 1000
+    df = df[['Id', 'Film', 'Cliente', 'Voto', 'Data']]
     return Tabella('recensione', df)
 
 
