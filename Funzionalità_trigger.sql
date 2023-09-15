@@ -6,13 +6,13 @@ drop procedure if exists InserisciConnessione;
 drop procedure if exists Disconnessione;
 drop TRIGGER if exists trg_ins_con;
 drop FUNCTION if exists CalcolaDistanza;
-DROP FUNCTION IF EXISTS RatingPersonalizzato;
 DROP PROCEDURE IF EXISTS Caching;
 DROP PROCEDURE IF EXISTS InserisciFile;
 DROP FUNCTION IF EXISTS RatingZona;
 DROP PROCEDURE IF EXISTS InserisciRecensione;
 DROP PROCEDURE IF EXISTS ConsigliaFilm;
 DROP PROCEDURE IF EXISTS InserisciSottoscrizione;
+DROP FUNCTION IF EXISTS RatingPersnalizzato;
 
 DROP PROCEDURE IF EXISTS ClassificaFilmPaese;
 DROP PROCEDURE IF EXISTS ClassificaFilmArea;
@@ -21,6 +21,7 @@ DROP PROCEDURE IF EXISTS ClassificaFormatiArea;
 
 DROP FUNCTION IF EXISTS LivelloMassimoConsentito;
 DROP FUNCTION IF EXISTS Compatibile;
+
 
 # funzione Livello massimo consentito, non testata
 DELIMITER //
@@ -309,9 +310,9 @@ BEGIN
         FROM nonsupportato
         WHERE nonsupportato.Paese = paese_con
     ) and 
-    Supportato(pt_cliente, file.Formato) = True and 
+    Compatibile(pt_cliente, file.Formato) = True and 
     server.Carico + (                    # bitrate
-		SELECT formato.Bitrate
+		SELECT formato.Bitrate / server.Capacità
         FROM formato
         WHERE formato.Id = file.Formato
     ) <= 1
@@ -351,7 +352,7 @@ BEGIN
 		SELECT Carico
         FROM server
         WHERE server.Id = server_scelto
-    ) > 0.7 THEN
+    ) > 0.05 THEN
     # prendi le connessioni che stanno streammando su quel server e valuta lo spostamento del server
     # tutto avviene senza interrompere le visualizzazioni
 	
@@ -389,7 +390,7 @@ BEGIN
             file.Server = s.Id
         ),
         (  # somma dei bitrate
-			SELECT SUM(formato.Bitrate)
+			SELECT SUM(formato.Bitrate) / s.Capacità
 			FROM file join formato on file.Formato = formato.Id
 			WHERE file.Server = s.Id
             AND file.Id IN (
@@ -425,7 +426,7 @@ BEGIN
     # rimuovi il carico dal server
     UPDATE server
     SET Carico = Carico - (
-		SELECT formato.Bitrate
+		SELECT formato.Bitrate / server.Capacità
         FROM formato JOIN file on file.Formato = formato.Id
         WHERE file.Id = (
 			SELECT visualizzazione.File
@@ -466,8 +467,8 @@ DELIMITER ;
 
 # funzione RatingPersonalizzato
 DELIMITER //
-CREATE FUNCTION RatingPersonalizzato(Film_ INT, Cliente_ INT) 
-RETURNS DECIMAL(10, 2)
+CREATE FUNCTION RatingPersnalizzato(Film_ INT, Cliente_ INT) 
+RETURNS DECIMAL(10, 4)
 READS SQL DATA
 BEGIN
     DECLARE r_Regista FLOAT;
@@ -476,6 +477,7 @@ BEGIN
     DECLARE r_PaeseProduzione FLOAT;
     DECLARE r_Critica FLOAT;
     DECLARE r_medio_film FLOAT;
+    DECLARE r_visual FLOAT;
     
     DECLARE f_regista INT;
     DECLARE f_genere VARCHAR(25);
@@ -587,10 +589,17 @@ BEGIN
 		SET r_medio_film = 5;
 	END IF;
     
-    # mancano premi, visualizzazioni, rating medio
+    SELECT 10 * nVisualizzazioni / (
+		SELECT MAX(film.nVisualizzazioni)
+        FROM film
+    ) into r_visual
+	FROM film
+    WHERE Id = film_;
+	
+    # mancano premi, 
     # mancano i pesi per le preferenze
     
-    RETURN (r_Regista + r_PaeseProduzione + r_Genere + r_Attori + r_Critica + r_medio_film) / 6;
+    RETURN (r_Regista + r_PaeseProduzione + r_Genere + r_Attori + r_Critica + r_medio_film + r_visual) / 7;
     
 END;
 //
@@ -602,22 +611,30 @@ DELIMITER ;
 # funzione caching
 # fatto ma al momento troppo lento per essere fatto
 DELIMITER //
-CREATE PROCEDURE Caching()
+CREATE PROCEDURE Caching(IN rapporto FLOAT)
 BEGIN
-	# sposta i file
+	DECLARE resto INT;
+	# verifica il rapporto
+    IF rapporto > 1 OR rapporto < 0.001 THEN
+		SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Rapporto non valido';
+	END IF;
+    SET resto = ROUND((RAND() * 1000), 0) % ROUND(1 / rapporto, 0);
+    
+    
     UPDATE file
     SET Server = (
 		# server nell'area geografica è più apprezzato
 		SELECT server.Id
         FROM server
-        ORDER BY RatingZona(server.Id, file.Film)
+        ORDER BY RatingZona(server.Id, file.Film) desc
         LIMIT 1
     )
     WHERE file.Id not in (
 		SELECT visualizzazione.File
         FROM visualizzazione
         WHERE visualizzazione.Fine IS NULL
-    ) AND file.Id % 20 = 0;
+    ) AND file.Id % ROUND(1 / rapporto, 0) = resto;
     
 END //
 DELIMITER ;
@@ -635,11 +652,12 @@ BEGIN
 	DECLARE r FLOAT;
     # conta quante visualizzazioni ha avuto da residenti dell'area
 	SELECT count(*) into r
-    FROM visualizzazione 
+    FROM file
+    right JOIN visualizzazione on visualizzazione.File = file.Id
     JOIN connessione on visualizzazione.Connessione = connessione.Id
     JOIN cliente on connessione.Cliente = cliente.Id
 	JOIN paese on cliente.PaeseResidenza = paese.Cod
-    WHERE paese.AreaGeografica = Area_;
+    WHERE paese.AreaGeografica = Area_ and file.Film = Film_;
     
     RETURN r;
 END;
@@ -659,11 +677,15 @@ BEGIN
 	# trova il server migliore
     DECLARE server_migliore VARCHAR(10);
     
-    SELECT server.Id INTO server_migliore
-    FROM server
-    ORDER BY RatingZona(server.Id, Film_)
-    LIMIT 1;
-
+	SELECT paese.AreaGeografica into server_migliore
+	FROM cliente
+	JOIN paese ON paese.Cod = cliente.PaeseResidenza
+	GROUP BY paese.AreaGeografica
+	ORDER BY avg(RatingPersnalizzato(Film_, cliente.Id)) desc
+	limit 1;
+    
+    
+	
 	# controlla l'ultimo id
     SELECT MAX(Id) INTO id_max
     FROM file;
@@ -708,6 +730,8 @@ DELIMITER ;
 
 
 
+
+
 # funzione consiglia film, non ancora testata
 DELIMITER //
 CREATE PROCEDURE ConsigliaFilm(IN Cliente_ INT)
@@ -724,10 +748,12 @@ BEGIN
     
     SELECT film.*
     FROM film
-    ORDER BY RatingPersonalizzato(film.Id, Cliente_)
+    ORDER BY RatingPersnalizzato(film.Id, Cliente_) desc
     LIMIT 10;
 END //
 DELIMITER ;
+
+
 
 
 # funzione inserisci sottoscrizione, non ancora testata 
@@ -817,7 +843,6 @@ DELIMITER ;
 
 
 
-
 # funzione classifica formati paese, testata
 DELIMITER //
 CREATE PROCEDURE ClassificaFormatiArea(IN area_ VARCHAR(50))
@@ -844,6 +869,14 @@ END //
 DELIMITER ;
 
 
+
+
+
+
+
+# ricavi divisi per area geografica
+
+# ricavi divisi per film
 
 
 
