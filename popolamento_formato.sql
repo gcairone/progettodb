@@ -1,0 +1,10 @@
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (0, 'MP4', 'MP4', '1920x1080', 8000, 'HD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (1, 'Formato2', 'Formato2', '1280x720', 4000, 'SD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (2, 'Formato3', 'Formato3', '3840x2160', 15000, 'UHD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (3, 'Formato4', 'Formato4', '1920x1080', 6000, 'HD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (4, 'Formato5', 'Formato5', '2560x1440', 12000, 'UHD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (5, 'Formato6', 'Formato6', '1280x720', 3500, 'SD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (6, 'Formato7', 'Formato7', '3840x2160', 18000, 'HD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (7, 'Formato8', 'Formato8', '1920x1080', 8000, 'SD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (8, 'Formato9', 'Formato9', '2560x1440', 10000, 'HD'); 
+INSERT INTO formato (Id, FormatoVideo, FormatoAudio, Risoluzione, Bitrate, qVideo) VALUES (9, 'Formato10', 'Formato10', '1280x720', 2500, 'HD'); 
