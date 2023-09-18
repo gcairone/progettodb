@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-09-18T16:11:16.975Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="Go-utWycDNkknA9KprY6" version="21.7.5" type="github">
+<mxfile host="app.diagrams.net" modified="2023-09-18T16:12:37.798Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="-9WJXflNVw3WLBtgLXPP" version="21.7.5" type="github">
   <diagram id="R2lEEEUBdFMjLlhIrx00" name="Page-1">
-    <mxGraphModel dx="954" dy="670" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0" extFonts="Permanent Marker^https://fonts.googleapis.com/css?family=Permanent+Marker">
+    <mxGraphModel dx="734" dy="515" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0" extFonts="Permanent Marker^https://fonts.googleapis.com/css?family=Permanent+Marker">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1460,19 +1460,19 @@
         <mxCell id="rAfbBRxYVSkPyXWiGhJ7-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="rAfbBRxYVSkPyXWiGhJ7-15" target="rAfbBRxYVSkPyXWiGhJ7-17" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rAfbBRxYVSkPyXWiGhJ7-15" value="Film-Valutazione" style="rhombus;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="1" vertex="1">
+        <mxCell id="rAfbBRxYVSkPyXWiGhJ7-15" value="Film-Critica" style="rhombus;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="1" vertex="1">
           <mxGeometry x="1071" y="377" width="110" height="50" as="geometry" />
         </mxCell>
         <mxCell id="rAfbBRxYVSkPyXWiGhJ7-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="rAfbBRxYVSkPyXWiGhJ7-16" target="k5sNIqVDAsuTKzZ9p33I-93" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rAfbBRxYVSkPyXWiGhJ7-16" value="Valutazione-Critico" style="rhombus;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="1" vertex="1">
+        <mxCell id="rAfbBRxYVSkPyXWiGhJ7-16" value="Valutazione" style="rhombus;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="1" vertex="1">
           <mxGeometry x="1366.5" y="377" width="110" height="50" as="geometry" />
         </mxCell>
         <mxCell id="rAfbBRxYVSkPyXWiGhJ7-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="rAfbBRxYVSkPyXWiGhJ7-17" target="rAfbBRxYVSkPyXWiGhJ7-16" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rAfbBRxYVSkPyXWiGhJ7-17" value="Valutazione" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="1" vertex="1">
+        <mxCell id="rAfbBRxYVSkPyXWiGhJ7-17" value="Critica" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="1" vertex="1">
           <mxGeometry x="1231" y="387" width="90" height="30" as="geometry" />
         </mxCell>
         <mxCell id="rAfbBRxYVSkPyXWiGhJ7-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endArrow=none;endFill=0;" parent="1" source="rAfbBRxYVSkPyXWiGhJ7-18" target="rAfbBRxYVSkPyXWiGhJ7-20" edge="1">
