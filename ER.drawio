@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-09-18T19:54:22.728Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="FAdUYkRxa3CWw9_DWJuA" version="21.7.5" type="github">
+<mxfile host="app.diagrams.net" modified="2023-09-18T20:28:09.269Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="hR9EdHwRnW8431VtGr0f" version="21.7.5" type="github">
   <diagram id="R2lEEEUBdFMjLlhIrx00" name="Page-1">
-    <mxGraphModel dx="830" dy="583" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0" extFonts="Permanent Marker^https://fonts.googleapis.com/css?family=Permanent+Marker">
+    <mxGraphModel dx="954" dy="670" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0" extFonts="Permanent Marker^https://fonts.googleapis.com/css?family=Permanent+Marker">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -561,11 +561,11 @@
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="dtsX3tauM8AvoUDdRxvp-31" value="FV" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="551" y="670" width="60" height="30" as="geometry" />
+        <mxCell id="dtsX3tauM8AvoUDdRxvp-31" value="File-Visualizzazione" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="551" y="665" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="dtsX3tauM8AvoUDdRxvp-32" value="VC" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="723" y="819" width="60" height="30" as="geometry" />
+        <mxCell id="dtsX3tauM8AvoUDdRxvp-32" value="Visualizzazione-Connessione" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="723" y="822" width="60" height="30" as="geometry" />
         </mxCell>
         <mxCell id="dtsX3tauM8AvoUDdRxvp-33" value="(1, 1)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="618" y="655" width="60" height="30" as="geometry" />
