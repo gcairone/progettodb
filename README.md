@@ -1,7 +1,3 @@
 # progettodb
 
-main.py: Contiene tutte le funzioni python per popolare le tabelle, e creare i .sql 
-
-tavola_volumi.py: Contiene tutti i parametri per la stima dei volumi di entità e relazioni
-
-ristrutturazione.txt: Contiene il lavoro di ristrutturazione, traduzione, normalizzazione
+This repository contains the source code and documentation for a university database project that focuses on building a content platform. This project includes features like content management, streaming CDN for multimedia content, and content recommendation.
